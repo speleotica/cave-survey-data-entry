@@ -18,12 +18,16 @@ type UseFieldPropsMap = {
   notes?: UseFieldProps;
 };
 
+export type LayoutVariant = "IMO" | "Lech";
+
 export const SurveyPageFields = React.memo(function SurveyPageFields({
   startIndex = 0,
   useFieldProps,
+  layoutVariant = "IMO",
 }: {
   startIndex?: number;
   useFieldProps?: UseFieldPropsMap;
+  layoutVariant?: LayoutVariant;
 }) {
   const numRows = 11;
   return (
@@ -43,6 +47,7 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
           }}
           key={index}
           index={index + startIndex}
+          layoutVariant={layoutVariant}
           useFieldProps={useFieldProps}
           includeShotFields={index < numRows - 1}
         />
@@ -56,9 +61,11 @@ const SurveyRow = ({
   index,
   useFieldProps,
   includeShotFields = true,
+  layoutVariant,
 }: {
   sx?: SxProps;
   index: number;
+  layoutVariant: LayoutVariant;
   useFieldProps?: UseFieldPropsMap;
   includeShotFields?: boolean;
 }) => {
@@ -78,11 +85,11 @@ const SurveyRow = ({
         index={index}
         useFieldProps={useFieldProps?.station}
         field="station"
-        placeholder="Sta"
+        // placeholder="Sta"
         sx={{
           flexGrow: 0,
           flexShrink: 0,
-          flexBasis: "19%",
+          flexBasis: layoutVariant === "Lech" ? "19%" : "16%",
         }}
       />
       <Box
@@ -90,7 +97,7 @@ const SurveyRow = ({
           position: "relative",
           flexGrow: 0,
           flexShrink: 0,
-          flexBasis: "37.5%",
+          flexBasis: layoutVariant === "Lech" ? "37.5%" : "40%",
           pointerEvents: "none",
         }}
       >
@@ -110,7 +117,7 @@ const SurveyRow = ({
               index={index}
               useFieldProps={useFieldProps?.distance}
               field="distance"
-              placeholder="Dist"
+              // placeholder="Dist"
               sx={{
                 flexBasis: 0,
                 flexGrow: 1,
@@ -131,13 +138,13 @@ const SurveyRow = ({
                 index={index}
                 field="frontsightAzimuth"
                 useFieldProps={useFieldProps?.frontsightAzimuth}
-                placeholder="FS Azm"
+                // placeholder="FS Azm"
               />
               <AngleField
                 index={index}
                 field="backsightAzimuth"
                 useFieldProps={useFieldProps?.backsightAzimuth}
-                placeholder="BS Azm"
+                // placeholder="BS Azm"
               />
             </Box>
             <Box
@@ -154,13 +161,13 @@ const SurveyRow = ({
                 index={index}
                 field="frontsightInclination"
                 useFieldProps={useFieldProps?.frontsightInclination}
-                placeholder="FS Inc"
+                // placeholder="FS Inc"
               />
               <AngleField
                 index={index}
                 field="backsightInclination"
                 useFieldProps={useFieldProps?.backsightInclination}
-                placeholder="BS Inc"
+                // placeholder="BS Inc"
               />
             </Box>
           </Box>
@@ -181,35 +188,35 @@ const SurveyRow = ({
           index={index}
           field="left"
           useFieldProps={useFieldProps?.left}
-          placeholder="L"
+          // placeholder="L"
         />
         <SurveyTextField
           index={index}
           field="right"
           useFieldProps={useFieldProps?.right}
-          placeholder="R"
+          // placeholder="R"
         />
         <SurveyTextField
           index={index}
           field="up"
           useFieldProps={useFieldProps?.up}
-          placeholder="U"
+          // placeholder="U"
         />
         <SurveyTextField
           index={index}
           field="down"
           useFieldProps={useFieldProps?.down}
-          placeholder="D"
+          // placeholder="D"
         />
         <SurveyTextField
           index={index}
           field="notes"
           useFieldProps={useFieldProps?.notes}
-          placeholder="Notes"
+          // placeholder="Notes"
           sx={{
             flexGrow: 0,
             flexShrink: 0,
-            flexBasis: "43%",
+            flexBasis: layoutVariant === "Lech" ? "43%" : "30%",
           }}
         />
       </Box>
@@ -321,6 +328,9 @@ const SurveyTextField = ({
         flexGrow: 1,
         flexShrink: 1,
         flexBasis: "10%",
+        backgroundColor: fieldProps?.value
+          ? "rgba(255, 255, 255, 0.8)"
+          : "none",
         ...sx,
       }}
       inputProps={{

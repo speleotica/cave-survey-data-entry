@@ -12,6 +12,18 @@ export type Shot = {
   notes?: string;
 };
 
+export type PageImage = {
+  /**
+   * The mime type
+   */
+  type: string;
+  /**
+   * The base-64 encoded data
+   */
+  data: string;
+};
+
 export type Values = {
+  pageImages?: PageImage[];
   shots?: Shot[];
 };
