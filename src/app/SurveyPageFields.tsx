@@ -1,5 +1,3 @@
-"use client";
-
 import { Box, SxProps, TextField } from "@mui/material";
 import { css } from "@emotion/css";
 import * as React from "react";
@@ -20,14 +18,14 @@ type UseFieldPropsMap = {
   notes?: UseFieldProps;
 };
 
-export function SurveyPageFields({
+export const SurveyPageFields = React.memo(function SurveyPageFields({
   startIndex = 0,
   useFieldProps,
 }: {
   startIndex?: number;
   useFieldProps?: UseFieldPropsMap;
 }) {
-  const numRows = 8;
+  const numRows = 11;
   return (
     <Box
       sx={{
@@ -51,7 +49,7 @@ export function SurveyPageFields({
       ))}
     </Box>
   );
-}
+});
 
 const SurveyRow = ({
   sx,
@@ -80,13 +78,18 @@ const SurveyRow = ({
         index={index}
         useFieldProps={useFieldProps?.station}
         placeholder="Sta"
+        sx={{
+          flexGrow: 0,
+          flexShrink: 0,
+          flexBasis: "19%",
+        }}
       />
       <Box
         sx={{
           position: "relative",
-          flexGrow: 1,
-          flexShrink: 1,
-          flexBasis: "30%",
+          flexGrow: 0,
+          flexShrink: 0,
+          flexBasis: "37.5%",
           pointerEvents: "none",
         }}
       >
@@ -157,31 +160,48 @@ const SurveyRow = ({
           </Box>
         )}
       </Box>
-      <SurveyTextField
-        index={index}
-        useFieldProps={useFieldProps?.left}
-        placeholder="L"
-      />
-      <SurveyTextField
-        index={index}
-        useFieldProps={useFieldProps?.right}
-        placeholder="R"
-      />
-      <SurveyTextField
-        index={index}
-        useFieldProps={useFieldProps?.up}
-        placeholder="U"
-      />
-      <SurveyTextField
-        index={index}
-        useFieldProps={useFieldProps?.down}
-        placeholder="D"
-      />
-      <SurveyTextField
-        index={index}
-        useFieldProps={useFieldProps?.notes}
-        placeholder="Notes"
-      />
+      <Box
+        sx={{
+          flexBasis: 0,
+          flexGrow: 1,
+          flexShrink: 1,
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "nowrap",
+          alignItems: "stretch",
+        }}
+      >
+        <SurveyTextField
+          index={index}
+          useFieldProps={useFieldProps?.left}
+          placeholder="L"
+        />
+        <SurveyTextField
+          index={index}
+          useFieldProps={useFieldProps?.right}
+          placeholder="R"
+        />
+        <SurveyTextField
+          index={index}
+          useFieldProps={useFieldProps?.up}
+          placeholder="U"
+        />
+        <SurveyTextField
+          index={index}
+          useFieldProps={useFieldProps?.down}
+          placeholder="D"
+        />
+        <SurveyTextField
+          index={index}
+          useFieldProps={useFieldProps?.notes}
+          placeholder="Notes"
+          sx={{
+            flexGrow: 0,
+            flexShrink: 0,
+            flexBasis: "43%",
+          }}
+        />
+      </Box>
     </Box>
   );
 };
@@ -190,6 +210,7 @@ const SurveyTextField = ({
   index,
   useFieldProps,
   sx,
+  inputProps,
   InputProps,
   ...props
 }: React.ComponentProps<typeof TextField> & {
@@ -206,11 +227,19 @@ const SurveyTextField = ({
         flexBasis: "10%",
         ...sx,
       }}
+      inputProps={{
+        className: css`
+          padding: 2px;
+          text-align: center;
+        `,
+        ...inputProps,
+      }}
       InputProps={{
         ...InputProps,
         sx: {
           borderRadius: 0,
           height: "100%",
+          fontSize: "0.8rem",
           ...InputProps?.sx,
         },
       }}
@@ -235,13 +264,6 @@ const AngleField = ({
         flexShrink: 1,
         flexBasis: 0,
         ...sx,
-      }}
-      inputProps={{
-        className: css`
-          padding-top: 0;
-          padding-bottom: 0;
-        `,
-        ...inputProps,
       }}
       InputProps={{
         ...InputProps,
