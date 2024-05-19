@@ -77,6 +77,7 @@ const SurveyRow = ({
       <SurveyTextField
         index={index}
         useFieldProps={useFieldProps?.station}
+        field="station"
         placeholder="Sta"
         sx={{
           flexGrow: 0,
@@ -108,6 +109,7 @@ const SurveyRow = ({
             <SurveyTextField
               index={index}
               useFieldProps={useFieldProps?.distance}
+              field="distance"
               placeholder="Dist"
               sx={{
                 flexBasis: 0,
@@ -127,11 +129,13 @@ const SurveyRow = ({
             >
               <AngleField
                 index={index}
+                field="frontsightAzimuth"
                 useFieldProps={useFieldProps?.frontsightAzimuth}
                 placeholder="FS Azm"
               />
               <AngleField
                 index={index}
+                field="backsightAzimuth"
                 useFieldProps={useFieldProps?.backsightAzimuth}
                 placeholder="BS Azm"
               />
@@ -148,11 +152,13 @@ const SurveyRow = ({
             >
               <AngleField
                 index={index}
+                field="frontsightInclination"
                 useFieldProps={useFieldProps?.frontsightInclination}
                 placeholder="FS Inc"
               />
               <AngleField
                 index={index}
+                field="backsightInclination"
                 useFieldProps={useFieldProps?.backsightInclination}
                 placeholder="BS Inc"
               />
@@ -173,26 +179,31 @@ const SurveyRow = ({
       >
         <SurveyTextField
           index={index}
+          field="left"
           useFieldProps={useFieldProps?.left}
           placeholder="L"
         />
         <SurveyTextField
           index={index}
+          field="right"
           useFieldProps={useFieldProps?.right}
           placeholder="R"
         />
         <SurveyTextField
           index={index}
+          field="up"
           useFieldProps={useFieldProps?.up}
           placeholder="U"
         />
         <SurveyTextField
           index={index}
+          field="down"
           useFieldProps={useFieldProps?.down}
           placeholder="D"
         />
         <SurveyTextField
           index={index}
+          field="notes"
           useFieldProps={useFieldProps?.notes}
           placeholder="Notes"
           sx={{
@@ -207,6 +218,7 @@ const SurveyRow = ({
 };
 
 const SurveyTextField = ({
+  field,
   index,
   useFieldProps,
   sx,
@@ -214,13 +226,97 @@ const SurveyTextField = ({
   InputProps,
   ...props
 }: React.ComponentProps<typeof TextField> & {
+  field?:
+    | "station"
+    | "distance"
+    | "frontsightAzimuth"
+    | "backsightAzimuth"
+    | "frontsightInclination"
+    | "backsightInclination"
+    | "left"
+    | "right"
+    | "up"
+    | "down"
+    | "notes";
   index: number;
   useFieldProps?: UseFieldProps;
 }) => {
+  const fieldProps = useFieldProps?.(index);
+
+  const onKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
+      let otherInput: Element | null = null;
+      if (event.key === "ArrowUp") {
+        switch (field) {
+          case "frontsightAzimuth":
+            otherInput = document.querySelector(
+              `[data-field="backsightAzimuth"][data-index="${index - 1}"]`
+            );
+            break;
+          case "backsightAzimuth":
+            otherInput = document.querySelector(
+              `[data-field="frontsightAzimuth"][data-index="${index}"]`
+            );
+            break;
+          case "frontsightInclination":
+            otherInput = document.querySelector(
+              `[data-field="backsightInclination"][data-index="${index - 1}"]`
+            );
+            break;
+          case "backsightInclination":
+            otherInput = document.querySelector(
+              `[data-field="frontsightInclination"][data-index="${index}"]`
+            );
+            break;
+          default:
+            otherInput = document.querySelector(
+              `[data-field="${field}"][data-index="${index - 1}"]`
+            );
+            break;
+        }
+      }
+      if (event.key === "ArrowDown") {
+        switch (field) {
+          case "frontsightAzimuth":
+            otherInput = document.querySelector(
+              `[data-field="backsightAzimuth"][data-index="${index}"]`
+            );
+            break;
+          case "backsightAzimuth":
+            otherInput = document.querySelector(
+              `[data-field="frontsightAzimuth"][data-index="${index + 1}"]`
+            );
+            break;
+          case "frontsightInclination":
+            otherInput = document.querySelector(
+              `[data-field="backsightInclination"][data-index="${index}"]`
+            );
+            break;
+          case "backsightInclination":
+            otherInput = document.querySelector(
+              `[data-field="frontsightInclination"][data-index="${index + 1}"]`
+            );
+            break;
+          default:
+            otherInput = document.querySelector(
+              `[data-field="${field}"][data-index="${index + 1}"]`
+            );
+            break;
+        }
+      }
+      if (otherInput instanceof HTMLInputElement) {
+        otherInput.focus();
+        otherInput.select();
+      }
+    },
+    [field, index]
+  );
+
   return (
     <TextField
-      {...useFieldProps?.(index)}
+      {...fieldProps}
       {...props}
+      onKeyDown={onKeyDown}
       sx={{
         flexGrow: 1,
         flexShrink: 1,
@@ -228,6 +324,8 @@ const SurveyTextField = ({
         ...sx,
       }}
       inputProps={{
+        "data-field": field,
+        "data-index": index,
         className: css`
           padding: 2px;
           text-align: center;
@@ -252,10 +350,7 @@ const AngleField = ({
   inputProps,
   InputProps,
   ...props
-}: React.ComponentProps<typeof TextField> & {
-  index: number;
-  useFieldProps?: UseFieldProps;
-}) => {
+}: React.ComponentProps<typeof SurveyTextField>) => {
   return (
     <SurveyTextField
       {...props}

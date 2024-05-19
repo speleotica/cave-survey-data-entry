@@ -4,6 +4,7 @@ import { FrcsShot, FrcsShotKind } from "@speleotica/frcsdata/FrcsShot";
 import { FrcsTripHeader, formatFrcsShot } from "@speleotica/frcsdata";
 
 export function generateFrcsOutput({ shots }: Values): string {
+  if (!shots) return "";
   const header: FrcsTripHeader = {
     name: "Trip",
     distanceUnit: Length.feet,

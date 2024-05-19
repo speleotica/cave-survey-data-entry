@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import { SurveyPageFields } from "./SurveyPageFields";
 import Image from "next/image";
 import blankSheet from "./blank-sheet.jpg";
-import { TextField } from "@mui/material";
+import { Button, MenuItem, TextField } from "@mui/material";
 import { Form, FormSpy, useField } from "react-final-form";
 import { throttle } from "lodash";
 import { Values } from "./types";
@@ -42,45 +42,43 @@ export default function Home() {
           sx={{
             my: 4,
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+            flexDirection: "row",
+            alignItems: "stretch",
             position: "relative",
           }}
         >
           <Box
             sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
+              flexBasis: 600,
+              flexShrink: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
             }}
           >
-            <Image
-              src={blankSheet}
-              alt="survey sheet"
-              height={800}
-              width={600}
-            />
+            <ClearButton />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                overflow: "scroll",
+                maxHeight: 1000,
+              }}
+            >
+              <SurveySheet />
+              <SurveySheet pageNumber={1} />
+            </Box>
           </Box>
           <Box
             sx={{
-              position: "absolute",
-              top: 113,
-              left: 15,
-              width: 520,
-              height: 632,
-              border: "1px solid red",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <SurveyPageFields useFieldProps={useFieldPropsMap} />
-          </Box>
-          <Box
-            sx={{
-              position: "absolute",
-              top: 16,
-              left: 600,
-            }}
-          >
+            <TextField label="Format" select value="frcs">
+              <MenuItem value="frcs">FRCS</MenuItem>
+            </TextField>
             <OutputField />
           </Box>
         </Box>
@@ -89,7 +87,47 @@ export default function Home() {
   );
 }
 
-export function OutputField() {
+function ClearButton() {
+  const {
+    input: { onChange },
+  } = useField("shots");
+  return (
+    <Button
+      onClick={() => {
+        onChange([]);
+      }}
+    >
+      Clear
+    </Button>
+  );
+}
+
+function SurveySheet({ pageNumber = 0 }: { pageNumber?: number }) {
+  return (
+    <Box sx={{ position: "relative" }}>
+      <Box>
+        <Image src={blankSheet} alt="survey sheet" height={800} width={600} />
+      </Box>
+      <Box
+        sx={{
+          position: "absolute",
+          top: 113,
+          left: 15,
+          width: 520,
+          height: 632,
+          border: "1px solid red",
+        }}
+      >
+        <SurveyPageFields
+          useFieldProps={useFieldPropsMap}
+          startIndex={pageNumber * 10}
+        />
+      </Box>
+    </Box>
+  );
+}
+
+function OutputField() {
   const [value, setValue] = React.useState("");
 
   const handleChange = React.useMemo(

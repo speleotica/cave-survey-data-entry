@@ -13,5 +13,5 @@ export type Shot = {
 };
 
 export type Values = {
-  shots: Shot[];
+  shots?: Shot[];
 };
