@@ -13,7 +13,7 @@ export function generateFrcsOutput({ shots }: Values): string {
   };
   const frcsShots: FrcsShot[] = [];
   for (let i = 0; i < shots.length - 1; i++) {
-    const from = shots[i]?.fromStation;
+    const from = shots[i]?.from?.station;
     if (!from) continue;
     let excludeDistance = false;
     let rawDistance = shots[i]?.distance;
@@ -25,7 +25,9 @@ export function generateFrcsOutput({ shots }: Values): string {
     if (!distance) continue;
     frcsShots.push({
       from,
-      to: shots[i + 1]?.fromStation,
+      to: shots[i + 1]?.isSplit
+        ? shots[i + 1]?.to?.station
+        : shots[i + 1]?.from?.station,
       kind: FrcsShotKind.Normal,
       distance,
       excludeDistance,
@@ -34,17 +36,24 @@ export function generateFrcsOutput({ shots }: Values): string {
       frontsightInclination: parseAngle(shots[i]?.frontsightInclination),
       backsightInclination: parseAngle(shots[i]?.backsightInclination),
       fromLruds: {
-        left: parseDistance(shots[i]?.left),
-        right: parseDistance(shots[i]?.right),
-        up: parseDistance(shots[i]?.up),
-        down: parseDistance(shots[i]?.down),
+        left: parseDistance(shots[i]?.from?.left),
+        right: parseDistance(shots[i]?.from?.right),
+        up: parseDistance(shots[i]?.from?.up),
+        down: parseDistance(shots[i]?.from?.down),
       },
-      toLruds: {
-        left: parseDistance(shots[i + 1]?.left),
-        right: parseDistance(shots[i + 1]?.right),
-        up: parseDistance(shots[i + 1]?.up),
-        down: parseDistance(shots[i + 1]?.down),
-      },
+      toLruds: shots[i + 1]?.isSplit
+        ? {
+            left: parseDistance(shots[i + 1]?.to?.left),
+            right: parseDistance(shots[i + 1]?.to?.right),
+            up: parseDistance(shots[i + 1]?.to?.up),
+            down: parseDistance(shots[i + 1]?.to?.down),
+          }
+        : {
+            left: parseDistance(shots[i + 1]?.from?.left),
+            right: parseDistance(shots[i + 1]?.from?.right),
+            up: parseDistance(shots[i + 1]?.from?.up),
+            down: parseDistance(shots[i + 1]?.from?.down),
+          },
       comment: shots[i + 1]?.notes,
     });
   }

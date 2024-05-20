@@ -17,16 +17,26 @@ const useFieldProps = (subfield: string) => (index: number) => {
 };
 
 const useFieldPropsMap = {
-  station: useFieldProps("fromStation"),
+  from: {
+    station: useFieldProps("from.station"),
+    left: useFieldProps("from.left"),
+    right: useFieldProps("from.right"),
+    up: useFieldProps("from.up"),
+    down: useFieldProps("from.down"),
+  },
+  to: {
+    station: useFieldProps("to.station"),
+    left: useFieldProps("to.left"),
+    right: useFieldProps("to.right"),
+    up: useFieldProps("to.up"),
+    down: useFieldProps("to.down"),
+  },
+  isSplit: useFieldProps("isSplit"),
   distance: useFieldProps("distance"),
   frontsightAzimuth: useFieldProps("frontsightAzimuth"),
   backsightAzimuth: useFieldProps("backsightAzimuth"),
   frontsightInclination: useFieldProps("frontsightInclination"),
   backsightInclination: useFieldProps("backsightInclination"),
-  left: useFieldProps("left"),
-  right: useFieldProps("right"),
-  up: useFieldProps("up"),
-  down: useFieldProps("down"),
   notes: useFieldProps("notes"),
 };
 
@@ -74,10 +84,9 @@ export function SurveySheet({ pageIndex = 0 }: { pageIndex?: number }) {
       </Box>
       <ResizableRect
         bounds={rectBounds}
-        onResize={(bounds) => {
-          console.log(bounds);
-          setTable({ ...table, bounds: rectToTableBounds(bounds) });
-        }}
+        onResize={(bounds) =>
+          setTable({ ...table, bounds: rectToTableBounds(bounds) })
+        }
       />
       <TextField
         value={layoutVariant}

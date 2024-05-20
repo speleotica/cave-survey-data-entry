@@ -1,17 +1,23 @@
 import z from "zod";
 
+export const StationAndLruds = z.object({
+  station: z.string().optional(),
+  left: z.string().optional(),
+  right: z.string().optional(),
+  up: z.string().optional(),
+  down: z.string().optional(),
+});
+
 export type Shot = z.output<typeof Shot>;
 export const Shot = z.object({
-  fromStation: z.string().optional(),
+  from: StationAndLruds.optional(),
+  to: StationAndLruds.optional(),
+  isSplit: z.boolean().optional(),
   distance: z.string().optional(),
   frontsightAzimuth: z.string().optional(),
   backsightAzimuth: z.string().optional(),
   frontsightInclination: z.string().optional(),
   backsightInclination: z.string().optional(),
-  left: z.string().optional(),
-  right: z.string().optional(),
-  up: z.string().optional(),
-  down: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -99,9 +105,11 @@ export const Table = z.object({
 
 export type Values = z.output<typeof Values>;
 export const Values = z.object({
-  pageImages: z.array(PageImage).optional(),
-  tables: z.array(Table).optional(),
-  shots: z.array(Shot).optional(),
+  pageImages: z
+    .array(PageImage.nullish().transform((e) => e ?? undefined))
+    .optional(),
+  tables: z.array(Table.nullish().transform((e) => e ?? undefined)).optional(),
+  shots: z.array(Shot.nullish().transform((e) => e ?? undefined)).optional(),
 });
 
 export type ValuesBesidesPageImages = z.output<typeof ValuesBesidesPageImages>;

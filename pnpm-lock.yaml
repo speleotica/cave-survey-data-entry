@@ -18,7 +18,7 @@ dependencies:
     specifier: latest
     version: 11.11.5(@emotion/react@11.11.4)(@types/react@18.3.2)(react@18.3.1)
   '@mui/icons-material':
-    specifier: latest
+    specifier: ^5.15.18
     version: 5.15.18(@mui/material@5.15.18)(@types/react@18.3.2)(react@18.3.1)
   '@mui/material':
     specifier: latest

@@ -14,7 +14,7 @@
     "@emotion/css": "^11.11.2",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
-    "@mui/icons-material": "latest",
+    "@mui/icons-material": "^5.15.18",
     "@mui/material": "latest",
     "@mui/material-nextjs": "latest",
     "@speleotica/frcsdata": "^4.2.0",
