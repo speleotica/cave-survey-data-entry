@@ -16,6 +16,9 @@ the image, then click in the text fields and begin typing in the values.
 Use `tab`/`shift + tab` or the arrow keys to go through the fields
 quickly.
 
+The data is saved in local storage, so it should come back up if you
+reopen the page later on the same device and web browser.
+
 Once you've entered values, the formatted data will appear in the
 right pane. At the moment only the survey data format we use at
 Fisher Ridge is supported, but I'll add Compass and Walls soon.
