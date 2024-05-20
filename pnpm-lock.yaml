@@ -50,6 +50,9 @@ dependencies:
   react-final-form:
     specifier: ^6.5.9
     version: 6.5.9(final-form@4.20.10)(react@18.3.1)
+  zod:
+    specifier: ^3.23.8
+    version: 3.23.8
 
 devDependencies:
   '@types/lodash':
@@ -3391,3 +3394,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+    dev: false

@@ -1,29 +1,108 @@
-export type Shot = {
-  fromStation?: string;
-  distance?: string;
-  frontsightAzimuth?: string;
-  backsightAzimuth?: string;
-  frontsightInclination?: string;
-  backsightInclination?: string;
-  left?: string;
-  right?: string;
-  up?: string;
-  down?: string;
-  notes?: string;
-};
+import z from "zod";
 
-export type PageImage = {
+export type Shot = z.output<typeof Shot>;
+export const Shot = z.object({
+  fromStation: z.string().optional(),
+  distance: z.string().optional(),
+  frontsightAzimuth: z.string().optional(),
+  backsightAzimuth: z.string().optional(),
+  frontsightInclination: z.string().optional(),
+  backsightInclination: z.string().optional(),
+  left: z.string().optional(),
+  right: z.string().optional(),
+  up: z.string().optional(),
+  down: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type LayoutVariant = z.output<typeof LayoutVariant>;
+export const LayoutVariant = z.enum(["IMO", "Lech"]);
+
+export type PageImage = z.output<typeof PageImage>;
+export const PageImage = z.object({
   /**
    * The mime type
    */
-  type: string;
+  type: z.string(),
   /**
    * The base-64 encoded data
    */
-  data: string;
+  data: z.string(),
+});
+
+export const Point = z.object({
+  x: z.number(),
+  y: z.number(),
+});
+
+export type TableBounds = z.output<typeof TableBounds>;
+/**
+ * The state is modeled as all four corners of the table in case
+ * I decided to support perspective distortion in the future.
+ * In practice the rectangle edges can only be vertical and horizontal
+ * right now.
+ */
+export const TableBounds = z.object({
+  topLeft: Point,
+  topRight: Point,
+  bottomLeft: Point,
+  bottomRight: Point,
+});
+
+export type Rect = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
 };
 
-export type Values = {
-  pageImages?: PageImage[];
-  shots?: Shot[];
-};
+export function rectToTableBounds({
+  top,
+  left,
+  width,
+  height,
+}: Rect): TableBounds {
+  return {
+    topLeft: { x: left, y: top },
+    topRight: { x: left + width, y: top },
+    bottomLeft: { x: left, y: top + height },
+    bottomRight: { x: left + width, y: top + height },
+  };
+}
+
+export function tableBoundsToRect({
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight,
+}: TableBounds): Rect {
+  if (
+    topLeft.x !== bottomLeft.x ||
+    topLeft.y !== topRight.y ||
+    topRight.x !== bottomRight.x ||
+    bottomRight.y !== bottomLeft.y
+  ) {
+    throw new Error(`bounds are non-rectilinear, not supported yet`);
+  }
+  return {
+    top: topLeft.y,
+    left: topLeft.x,
+    width: topRight.x - topLeft.x,
+    height: bottomLeft.y - topLeft.y,
+  };
+}
+
+export const Table = z.object({
+  layoutVariant: LayoutVariant.optional(),
+  bounds: TableBounds.optional(),
+});
+
+export type Values = z.output<typeof Values>;
+export const Values = z.object({
+  pageImages: z.array(PageImage).optional(),
+  tables: z.array(Table).optional(),
+  shots: z.array(Shot).optional(),
+});
+
+export type ValuesBesidesPageImages = z.output<typeof ValuesBesidesPageImages>;
+export const ValuesBesidesPageImages = Values.omit({ pageImages: true });

@@ -12,7 +12,9 @@ export function OutputField() {
   const handleChange = React.useMemo(
     () =>
       throttle(({ values }: FormState<Values>) => {
-        setTimeout(() => setValue(generateFrcsOutput(values)), 0);
+        setTimeout(() => {
+          setValue(generateFrcsOutput(values));
+        }, 0);
       }, 500),
     []
   );

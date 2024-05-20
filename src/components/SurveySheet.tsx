@@ -1,7 +1,12 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import { LayoutVariant, SurveyPageFields } from "./SurveyPageFields";
-import { PageImage } from "./types";
+import { SurveyPageFields } from "./SurveyPageFields";
+import {
+  LayoutVariant,
+  PageImage,
+  rectToTableBounds,
+  tableBoundsToRect,
+} from "./types";
 import { useField } from "react-final-form";
 import { ResizableRect } from "./ResizableRect";
 import { IconButton, MenuItem, TextField } from "@mui/material";
@@ -25,57 +30,68 @@ const useFieldPropsMap = {
   notes: useFieldProps("notes"),
 };
 
-export function SurveySheet({
-  pageImage,
-  pageIndex: pageNumber = 0,
-}: {
-  pageImage: PageImage;
-  pageIndex?: number;
-}) {
-  const src = React.useMemo(
-    () => `data:${pageImage.type};base64,${pageImage.data}`,
-    [pageImage]
-  );
-
-  const [tableBounds, setTableBounds] = React.useState({
+const defaultTable = {
+  layoutVariant: "IMO",
+  bounds: rectToTableBounds({
     top: 113,
     left: 15,
     width: 520,
     height: 632,
-  });
+  }),
+};
 
-  const [layoutVariant, setLayoutVariant] =
-    React.useState<LayoutVariant>("IMO");
+export function SurveySheet({ pageIndex = 0 }: { pageIndex?: number }) {
+  const {
+    input: { value: pageImage },
+  } = useField(`pageImages[${pageIndex}]`);
+  const {
+    input: { value: table = defaultTable, onChange: setTable },
+  } = useField(`tables[${pageIndex}]`);
+
+  const {
+    layoutVariant = defaultTable?.layoutVariant,
+    bounds = defaultTable?.bounds,
+  } = table;
+
+  const rectBounds = React.useMemo(() => tableBoundsToRect(bounds), [bounds]);
 
   return (
     <Box sx={{ position: "relative" }}>
       <Box sx={{ userSelect: "none" }}>
-        <img src={src} alt="survey sheet" height={800} />
+        <img src={pageImage.data} alt="survey sheet" height={800} />
       </Box>
       <Box
         sx={{
-          ...tableBounds,
+          ...rectBounds,
           position: "absolute",
         }}
       >
         <SurveyPageFields
           layoutVariant={layoutVariant}
           useFieldProps={useFieldPropsMap}
-          startIndex={pageNumber * 11}
+          startIndex={pageIndex * 11}
         />
       </Box>
-      <ResizableRect bounds={tableBounds} onResize={setTableBounds} />
+      <ResizableRect
+        bounds={rectBounds}
+        onResize={(bounds) => {
+          console.log(bounds);
+          setTable({ ...table, bounds: rectToTableBounds(bounds) });
+        }}
+      />
       <TextField
         value={layoutVariant}
         variant="filled"
-        onChange={(e) => setLayoutVariant(e.target.value as any)}
+        onChange={(e) =>
+          setTable({ ...table, layoutVariant: e.target.value as any })
+        }
         select
         label="Layout"
         sx={{
           backgroundColor: "rgba(255, 255, 255, 0.8)",
           position: "absolute",
-          top: tableBounds.top - 60,
-          left: tableBounds.left,
+          top: rectBounds.top - 60,
+          left: rectBounds.left,
         }}
       >
         <MenuItem value="IMO">Inner Mountain Outfitters</MenuItem>

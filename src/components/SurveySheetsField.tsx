@@ -2,11 +2,10 @@ import { Box } from "@mui/material";
 import React from "react";
 import { FieldRenderProps } from "react-final-form";
 import { SurveySheet } from "./SurveySheet";
-import { arrayBufferToBase64 } from "./arrayBufferToBase64";
 import { PageImage } from "./types";
 
 export function SurveySheetsField({
-  input: { value, onChange },
+  input: { name, value, onChange },
 }: FieldRenderProps<PageImage[] | undefined>) {
   const handleDragOver = React.useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -17,12 +16,22 @@ export function SurveySheetsField({
       event.preventDefault();
       const { files } = event.dataTransfer;
       const newPageImages = [...(value || [])];
-      for (const file of files) {
-        newPageImages.push({
-          type: file.type,
-          data: arrayBufferToBase64(await file.arrayBuffer()),
-        });
-      }
+      const addedImages = await Promise.all(
+        [...files].map(async (file) => {
+          const data = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+          });
+          if (typeof data !== "string")
+            throw new Error(`expected readAsDataURL to produce a string`);
+          return {
+            type: file.type,
+            data,
+          } as const;
+        })
+      );
+      for (const img of addedImages) newPageImages.push(img);
       onChange(newPageImages);
     },
     [value]
@@ -43,7 +52,7 @@ export function SurveySheetsField({
       onDrop={handleDrop}
     >
       {(value || []).map((pageImage, index) => (
-        <SurveySheet key={index} pageImage={pageImage} pageIndex={index} />
+        <SurveySheet key={index} pageIndex={index} />
       ))}
       {!value?.length ? (
         <Box

@@ -1,6 +1,7 @@
 import { Box, SxProps, TextField } from "@mui/material";
 import { css } from "@emotion/css";
 import * as React from "react";
+import { LayoutVariant } from "./types";
 
 type UseFieldProps = (index: number) => React.ComponentProps<typeof TextField>;
 
@@ -17,8 +18,6 @@ type UseFieldPropsMap = {
   down?: UseFieldProps;
   notes?: UseFieldProps;
 };
-
-export type LayoutVariant = "IMO" | "Lech";
 
 export const SurveyPageFields = React.memo(function SurveyPageFields({
   startIndex = 0,
