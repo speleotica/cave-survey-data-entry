@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "cross-env NEXT_BASE_PATH=/cave-survey-data-entry next build",
     "start": "next start",
     "lint": "next lint",
-    "post-update": "echo \"codesandbox preview only, need an update\" && pnpm update --latest"
+    "post-update": "echo \"codesandbox preview only, need an update\" && pnpm update --latest",
+    "deploy": "pnpm build && gh-pages -d out -t true"
   },
   "dependencies": {
     "@emotion/cache": "latest",
@@ -32,8 +33,10 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "cross-env": "^7.0.3",
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "gh-pages": "^6.1.1",
     "typescript": "latest"
   }
 }
