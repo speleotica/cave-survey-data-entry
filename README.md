@@ -1,45 +1,21 @@
-# Material UI - Next.js App Router example in TypeScript
+# Cave Survey Data Entry App
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped using [`create-next-app`](https://github.com/vercel/next.js/tree/HEAD/packages/create-next-app) with Material UI installed.
+https://speleotica.github.io/cave-survey-data-entry
 
-## How to use
+This app makes it easier to enter measurements from cave
+surveys written on the typical staggered table style sheets!
 
-Download the example [or clone the repo](https://github.com/mui/material-ui):
+![App screenshot](screenshot.png)
 
-<!-- #default-branch-switch -->
+# How to use
 
-```bash
-curl https://codeload.github.com/mui/material-ui/tar.gz/master | tar -xz --strip=2  material-ui-master/examples/material-ui-nextjs-ts
-cd material-ui-nextjs-ts
-```
+Just drag and drop image files of your survey notes into the left
+pane. After a moment they will appear with a table overlaid outlined
+in red. Drag the corners of the red rectangle to fit the table to
+the image, then click in the text fields and begin typing in the values.
+Use `tab`/`shift + tab` or the arrow keys to go through the fields
+quickly.
 
-Install it and run:
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-or:
-
-<!-- #default-branch-switch -->
-
-[![Edit on StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/mui/material-ui/tree/master/examples/material-ui-nextjs-ts)
-
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/mui/material-ui/tree/master/examples/material-ui-nextjs-ts)
-
-## Learn more
-
-To learn more about this example:
-
-- [Next.js documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Customizing Material UI](https://mui.com/material-ui/customization/how-to-customize/) - approaches to customizing Material UI.
-
-## What's next?
-
-<!-- #default-branch-switch -->
-
-You now have a working example project.
-You can head back to the documentation and continue by browsing the [templates](https://mui.com/material-ui/getting-started/templates/) section.
+Once you've entered values, the formatted data will appear in the
+right pane. At the moment only the survey data format we use at
+Fisher Ridge is supported, but I'll add Compass and Walls soon.
