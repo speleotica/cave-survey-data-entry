@@ -74,7 +74,9 @@ export default function Home() {
                 <ClearDataButton />
                 <ClearAllButton />
               </Box>
-              <Box sx={{ display: "flex", flexDirection: "row", gap: 4 }}>
+              <Box
+                sx={{ display: "flex", flexDirection: "row", gap: 4, mb: 2 }}
+              >
                 <Field
                   name="backsightAzimuthCorrected"
                   type="checkbox"
