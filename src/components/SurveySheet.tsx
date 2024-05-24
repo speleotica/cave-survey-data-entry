@@ -1,42 +1,175 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import { SurveyPageFields } from "./SurveyPageFields";
-import {
-  LayoutVariant,
-  PageImage,
-  rectToTableBounds,
-  tableBoundsToRect,
-} from "./types";
-import { useField } from "react-final-form";
+import { Values, rectToTableBounds, tableBoundsToRect } from "./types";
+import { UseFieldConfig, useField } from "react-final-form";
 import { ResizableRect } from "./ResizableRect";
-import { IconButton, MenuItem, TextField } from "@mui/material";
+import { MenuItem, TextField } from "@mui/material";
+import { parseNumber } from "./parseNumber";
+import { get } from "lodash";
 
-const useFieldProps = (subfield: string) => (index: number) => {
-  const { input } = useField(`shots[${index}].${subfield}`);
-  return input;
-};
+const useFieldProps =
+  (
+    subfield: string,
+    config?: UseFieldConfig<any> | ((index: number) => UseFieldConfig<any>)
+  ) =>
+  (index: number) => {
+    const {
+      input,
+      meta: { error },
+    } = useField(
+      `shots[${index}].${subfield}`,
+      React.useMemo(
+        () => (typeof config === "function" ? config(index) : config),
+        [index]
+      )
+    );
+    return {
+      ...input,
+      ...(error ? { validationError: error } : {}),
+    };
+  };
+
+function validateNonnegativeNumber(value: any): string | undefined {
+  const parsed = parseNumber(value);
+  if (parsed == null) {
+    return /\S/.test(value || "") ? "invalid number" : undefined;
+  }
+  if (parsed < 0) return "must be >= 0";
+}
+
+function validateDistance(value: any): string | undefined {
+  if (typeof value === "string") value = value.replace(/\s*\*\s*$/, "");
+  const parsed = parseNumber(value);
+  if (parsed == null) {
+    return /\S/.test(value || "") ? "invalid distance" : undefined;
+  }
+  if (parsed < 0) return "must be >= 0";
+}
+
+function validateAzimuth(value: any): string | undefined {
+  const parsed = parseNumber(value);
+  if (parsed == null) {
+    return /\S/.test(value || "") ? "invalid azimuth" : undefined;
+  }
+  if (parsed < 0 || parsed >= 360) return "must be >= 0 and < 360";
+}
+function validateInclination(value: any): string | undefined {
+  const parsed = parseNumber(value);
+  if (parsed == null) {
+    return /\S/.test(value || "") ? "invalid inclination" : undefined;
+  }
+  if (parsed < -90 || parsed > 90) return "must be >= 90 and <= 90";
+}
+
+const useLrudFieldProps = (name: string) =>
+  useFieldProps(name, {
+    validateFields: [],
+    validate: (value) => {
+      return validateNonnegativeNumber(value);
+    },
+  });
 
 const useFieldPropsMap = {
   from: {
     station: useFieldProps("from.station"),
-    left: useFieldProps("from.left"),
-    right: useFieldProps("from.right"),
-    up: useFieldProps("from.up"),
-    down: useFieldProps("from.down"),
+    left: useLrudFieldProps("from.left"),
+    right: useLrudFieldProps("from.right"),
+    up: useLrudFieldProps("from.up"),
+    down: useLrudFieldProps("from.down"),
   },
   to: {
     station: useFieldProps("to.station"),
-    left: useFieldProps("to.left"),
-    right: useFieldProps("to.right"),
-    up: useFieldProps("to.up"),
-    down: useFieldProps("to.down"),
+    left: useLrudFieldProps("to.left"),
+    right: useLrudFieldProps("to.right"),
+    up: useLrudFieldProps("to.up"),
+    down: useLrudFieldProps("to.down"),
   },
   isSplit: useFieldProps("isSplit"),
-  distance: useFieldProps("distance"),
-  frontsightAzimuth: useFieldProps("frontsightAzimuth"),
-  backsightAzimuth: useFieldProps("backsightAzimuth"),
-  frontsightInclination: useFieldProps("frontsightInclination"),
-  backsightInclination: useFieldProps("backsightInclination"),
+  distance: useFieldProps("distance", {
+    validateFields: [],
+    validate: (value) => {
+      return validateDistance(value);
+    },
+  }),
+  frontsightAzimuth: useFieldProps("frontsightAzimuth", (index: number) => ({
+    validateFields: [`shots[${index}].backsightAzimuth`],
+    validate: (value, allValues: Values) => {
+      const v1 = validateAzimuth(value);
+      if (v1) return v1;
+      const fsValue = parseNumber(value);
+      const bsValue = parseNumber(allValues.shots?.[index]?.backsightAzimuth);
+      if (fsValue == null || bsValue == null) return;
+      let diff = Math.abs(fsValue - bsValue);
+      if (diff > 180) diff = 360 - diff;
+      if (diff > 2) {
+        return `frontsight and backsight differ by ${diff.toFixed(1)} degrees`;
+      }
+    },
+  })),
+  backsightAzimuth: useFieldProps("backsightAzimuth", (index: number) => ({
+    validateFields: [`shots[${index}].frontsightAzimuth`],
+    validate: (value, allValues: Values) => {
+      const v1 = validateAzimuth(value);
+      if (v1) return v1;
+      const bsValue = parseNumber(value);
+      const fsValue = parseNumber(allValues.shots?.[index]?.frontsightAzimuth);
+      if (fsValue == null || bsValue == null) return;
+      let diff = Math.abs(fsValue - bsValue);
+      if (diff > 180) diff = 360 - diff;
+      if (diff > 2) {
+        return `frontsight and backsight differ by ${diff.toFixed(1)} degrees`;
+      }
+    },
+  })),
+  frontsightInclination: useFieldProps(
+    "frontsightInclination",
+    (index: number) => ({
+      validateFields: [`shots[${index}].backsightInclination`],
+      validate: (value, allValues: Values) => {
+        const v1 = validateInclination(value);
+        if (v1) return v1;
+        const fsValue = parseNumber(value);
+        if (fsValue == null) return;
+        const bsValue = parseNumber(
+          allValues.shots?.[index]?.backsightInclination
+        );
+        const diff =
+          fsValue != null && bsValue != null
+            ? Math.abs(fsValue - bsValue)
+            : undefined;
+        if (diff != null && diff > 2) {
+          return `frontsight and backsight differ by ${diff.toFixed(
+            1
+          )} degrees`;
+        }
+      },
+    })
+  ),
+  backsightInclination: useFieldProps(
+    "backsightInclination",
+    (index: number) => ({
+      validateFields: [`shots[${index}].frontsightInclination`],
+      validate: (value, allValues: Values) => {
+        const v1 = validateInclination(value);
+        if (v1) return v1;
+        const bsValue = parseNumber(value);
+        if (bsValue == null) return;
+        const fsValue = parseNumber(
+          allValues.shots?.[index]?.frontsightInclination
+        );
+        const diff =
+          fsValue != null && bsValue != null
+            ? Math.abs(fsValue - bsValue)
+            : undefined;
+        if (diff != null && diff > 2) {
+          return `frontsight and backsight differ by ${diff.toFixed(
+            1
+          )} degrees`;
+        }
+      },
+    })
+  ),
   notes: useFieldProps("notes"),
 };
 

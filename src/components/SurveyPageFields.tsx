@@ -1,9 +1,20 @@
-import { Box, Fab, SxProps, TextField, Tooltip } from "@mui/material";
+import {
+  Box,
+  Fab,
+  InputAdornment,
+  SxProps,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import * as React from "react";
 import { LayoutVariant } from "./types";
-import { ViewStream } from "@mui/icons-material";
+import { ViewStream, Error } from "@mui/icons-material";
 
-type UseFieldProps = (index: number) => React.ComponentProps<typeof TextField>;
+type UseFieldProps = (index: number) => React.ComponentProps<
+  typeof TextField
+> & {
+  validationError?: React.ReactNode;
+};
 
 type UseStationAndLrudFieldProps = {
   station?: UseFieldProps;
@@ -435,7 +446,7 @@ const SurveyTextField = ({
   index: number;
   useFieldProps?: UseFieldProps;
 }) => {
-  const fieldProps = useFieldProps?.(index);
+  const { validationError, ...fieldProps } = useFieldProps?.(index) || {};
 
   const onKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
@@ -485,6 +496,7 @@ const SurveyTextField = ({
     <TextField
       {...fieldProps}
       {...props}
+      error={validationError != null}
       onKeyDown={onKeyDown}
       sx={{
         flexGrow: 1,
@@ -512,6 +524,13 @@ const SurveyTextField = ({
           fontSize: "0.8rem",
           ...InputProps?.sx,
         },
+        endAdornment: validationError ? (
+          <InputAdornment position="end" sx={{ mr: -1.5 }}>
+            <Tooltip title={validationError}>
+              <Error sx={{ color: "red", height: 16, width: 16 }} />
+            </Tooltip>
+          </InputAdornment>
+        ) : undefined,
       }}
     />
   );

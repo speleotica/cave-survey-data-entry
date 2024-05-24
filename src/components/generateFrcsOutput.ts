@@ -2,6 +2,7 @@ import { Values } from "./types";
 import { UnitizedNumber, Length, Angle, Unitize } from "@speleotica/unitized";
 import { FrcsShot, FrcsShotKind } from "@speleotica/frcsdata/FrcsShot";
 import { FrcsTripHeader, formatFrcsShot } from "@speleotica/frcsdata";
+import { parseNumber } from "./parseNumber";
 
 export function generateFrcsOutput({ shots }: Values): string {
   if (!shots) return "";
@@ -58,13 +59,6 @@ export function generateFrcsOutput({ shots }: Values): string {
     });
   }
   return frcsShots.map((shot) => formatFrcsShot(shot, header)).join("\n");
-}
-
-function parseNumber(value: string | undefined): number | undefined {
-  return value != null &&
-    /^\s*[-+]?(\d+(\.\d*)?|\.\d+)(e[-+]?\d+)?\s*$/i.test(value)
-    ? parseFloat(value)
-    : undefined;
 }
 
 function parseDistance(

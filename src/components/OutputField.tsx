@@ -6,7 +6,7 @@ import { FormSpy } from "react-final-form";
 import { generateFrcsOutput } from "./generateFrcsOutput";
 import { Values } from "./types";
 
-export function OutputField() {
+export function OutputField(props: React.ComponentProps<typeof TextField>) {
   const [value, setValue] = React.useState("");
 
   const handleChange = React.useMemo(
@@ -23,10 +23,9 @@ export function OutputField() {
     <>
       <TextField
         multiline
-        rows={40}
-        sx={{ width: 600 }}
         value={value}
         InputProps={{ readOnly: true, sx: { fontFamily: "monospace" } }}
+        {...props}
       />
       <FormSpy onChange={handleChange} subscription={{ values: true }} />
     </>

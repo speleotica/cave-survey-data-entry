@@ -14,6 +14,7 @@ import { PageImage, Shot, Values } from "./types";
 import { throttle } from "lodash";
 import { Button, MenuItem, TextField } from "@mui/material";
 import { FormState } from "final-form";
+import { SplitPane } from "./SplitPane";
 
 export default function Home() {
   const handleSubmit = React.useCallback((values: any) => {
@@ -36,48 +37,61 @@ export default function Home() {
   return (
     <Form<Values> initialValues={initialValues} onSubmit={handleSubmit}>
       {(props) => (
-        <Box
-          sx={{
-            my: 4,
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "stretch",
-            position: "relative",
-          }}
-        >
+        <>
           <PersistData />
-          <Box
+          <SplitPane
             sx={{
-              flexBasis: 600,
-              flexShrink: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+            slotProps={{
+              right: {
+                sx: {
+                  pt: 2,
+                },
+              },
             }}
           >
-            <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
-              <ClearDataButton />
-              <ClearAllButton />
+            <Box
+              sx={{
+                flexBasis: 600,
+                flexShrink: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+              }}
+            >
+              <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
+                <ClearDataButton />
+                <ClearAllButton />
+              </Box>
+              <Field
+                name="pageImages"
+                render={(props: FieldRenderProps<PageImage[] | undefined>) => (
+                  <SurveySheetsField {...props} />
+                )}
+              />
             </Box>
-            <Field
-              name="pageImages"
-              render={(props: FieldRenderProps<PageImage[] | undefined>) => (
-                <SurveySheetsField {...props} />
-              )}
-            />
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <TextField label="Format" select value="frcs">
-              <MenuItem value="frcs">FRCS</MenuItem>
-            </TextField>
-            <OutputField />
-          </Box>
-        </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "stretch",
+              }}
+            >
+              <TextField label="Format" select value="frcs" fullWidth>
+                <MenuItem value="frcs">FRCS</MenuItem>
+              </TextField>
+              <OutputField
+                fullWidth
+                sx={{ flexGrow: 1, flexShrink: 1, minHeight: 0, mt: 2 }}
+              />
+            </Box>
+          </SplitPane>
+        </>
       )}
     </Form>
   );
