@@ -45,8 +45,9 @@ export function SurveySheetsField({
         alignItems: "flex-start",
         overflow: "scroll",
         flexGrow: 1,
+        flexShrink: 1,
         alignSelf: "stretch",
-        maxHeight: 1000,
+        minHeight: 0,
       }}
       onDragOver={handleDragOver}
       onDrop={handleDrop}

@@ -6,7 +6,6 @@ import { UseFieldConfig, useField } from "react-final-form";
 import { ResizableRect } from "./ResizableRect";
 import { MenuItem, TextField } from "@mui/material";
 import { parseNumber } from "./parseNumber";
-import { get } from "lodash";
 
 const useFieldProps =
   (
@@ -93,13 +92,19 @@ const useFieldPropsMap = {
     },
   }),
   frontsightAzimuth: useFieldProps("frontsightAzimuth", (index: number) => ({
-    validateFields: [`shots[${index}].backsightAzimuth`],
+    validateFields: [
+      `shots[${index}].backsightAzimuth`,
+      "backsightAzimuthCorrected",
+    ],
     validate: (value, allValues: Values) => {
       const v1 = validateAzimuth(value);
       if (v1) return v1;
       const fsValue = parseNumber(value);
-      const bsValue = parseNumber(allValues.shots?.[index]?.backsightAzimuth);
+      let bsValue = parseNumber(allValues.shots?.[index]?.backsightAzimuth);
       if (fsValue == null || bsValue == null) return;
+      if (!allValues.backsightAzimuthCorrected) {
+        bsValue = (bsValue + 180) % 360;
+      }
       let diff = Math.abs(fsValue - bsValue);
       if (diff > 180) diff = 360 - diff;
       if (diff > 2) {
@@ -108,13 +113,19 @@ const useFieldPropsMap = {
     },
   })),
   backsightAzimuth: useFieldProps("backsightAzimuth", (index: number) => ({
-    validateFields: [`shots[${index}].frontsightAzimuth`],
+    validateFields: [
+      `shots[${index}].frontsightAzimuth`,
+      "backsightAzimuthCorrected",
+    ],
     validate: (value, allValues: Values) => {
       const v1 = validateAzimuth(value);
       if (v1) return v1;
-      const bsValue = parseNumber(value);
+      let bsValue = parseNumber(value);
       const fsValue = parseNumber(allValues.shots?.[index]?.frontsightAzimuth);
       if (fsValue == null || bsValue == null) return;
+      if (!allValues.backsightAzimuthCorrected) {
+        bsValue = (bsValue + 180) % 360;
+      }
       let diff = Math.abs(fsValue - bsValue);
       if (diff > 180) diff = 360 - diff;
       if (diff > 2) {
@@ -125,20 +136,21 @@ const useFieldPropsMap = {
   frontsightInclination: useFieldProps(
     "frontsightInclination",
     (index: number) => ({
-      validateFields: [`shots[${index}].backsightInclination`],
+      validateFields: [
+        `shots[${index}].backsightInclination`,
+        "backsightInclinationCorrected",
+      ],
       validate: (value, allValues: Values) => {
         const v1 = validateInclination(value);
         if (v1) return v1;
         const fsValue = parseNumber(value);
-        if (fsValue == null) return;
-        const bsValue = parseNumber(
+        let bsValue = parseNumber(
           allValues.shots?.[index]?.backsightInclination
         );
-        const diff =
-          fsValue != null && bsValue != null
-            ? Math.abs(fsValue - bsValue)
-            : undefined;
-        if (diff != null && diff > 2) {
+        if (fsValue == null || bsValue == null) return;
+        if (!allValues.backsightInclinationCorrected) bsValue = -bsValue;
+        const diff = Math.abs(fsValue - bsValue);
+        if (diff > 2) {
           return `frontsight and backsight differ by ${diff.toFixed(
             1
           )} degrees`;
@@ -153,16 +165,14 @@ const useFieldPropsMap = {
       validate: (value, allValues: Values) => {
         const v1 = validateInclination(value);
         if (v1) return v1;
-        const bsValue = parseNumber(value);
-        if (bsValue == null) return;
+        let bsValue = parseNumber(value);
         const fsValue = parseNumber(
           allValues.shots?.[index]?.frontsightInclination
         );
-        const diff =
-          fsValue != null && bsValue != null
-            ? Math.abs(fsValue - bsValue)
-            : undefined;
-        if (diff != null && diff > 2) {
+        if (fsValue == null || bsValue == null) return;
+        if (!allValues.backsightInclinationCorrected) bsValue = -bsValue;
+        const diff = Math.abs(fsValue - bsValue);
+        if (diff > 2) {
           return `frontsight and backsight differ by ${diff.toFixed(
             1
           )} degrees`;

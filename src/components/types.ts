@@ -105,6 +105,8 @@ export const Table = z.object({
 
 export type Values = z.output<typeof Values>;
 export const Values = z.object({
+  backsightAzimuthCorrected: z.boolean().default(true).optional(),
+  backsightInclinationCorrected: z.boolean().default(true).optional(),
   pageImages: z
     .array(PageImage.nullish().transform((e) => e ?? undefined))
     .optional(),

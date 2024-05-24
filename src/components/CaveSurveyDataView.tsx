@@ -12,7 +12,7 @@ import { OutputField } from "./OutputField";
 import { SurveySheetsField } from "./SurveySheetsField";
 import { PageImage, Shot, Values } from "./types";
 import { throttle } from "lodash";
-import { Button, MenuItem, TextField } from "@mui/material";
+import { Button, FormLabel, MenuItem, Switch, TextField } from "@mui/material";
 import { FormState } from "final-form";
 import { SplitPane } from "./SplitPane";
 
@@ -30,7 +30,12 @@ export default function Home() {
         ...JSON.parse(localStorage.getItem("caveSurveyDataValues") || ""),
       });
     } catch (error) {
-      return { pageImages: [], shots: [] };
+      return {
+        pageImages: [],
+        shots: [],
+        backsightAzimuthCorrected: true,
+        backsightInclinationCorrected: true,
+      };
     }
   }, []);
 
@@ -57,16 +62,39 @@ export default function Home() {
           >
             <Box
               sx={{
-                flexBasis: 600,
+                flexGrow: 1,
                 flexShrink: 1,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-start",
+                overflow: "hidden",
               }}
             >
               <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
                 <ClearDataButton />
                 <ClearAllButton />
+              </Box>
+              <Box sx={{ display: "flex", flexDirection: "row", gap: 4 }}>
+                <Field
+                  name="backsightAzimuthCorrected"
+                  type="checkbox"
+                  render={({ input }) => (
+                    <FormLabel>
+                      <Switch {...input} />
+                      Corrected Backsight Azimuths
+                    </FormLabel>
+                  )}
+                />
+                <Field
+                  name="backsightInclinationCorrected"
+                  type="checkbox"
+                  render={({ input }) => (
+                    <FormLabel>
+                      <Switch {...input} />
+                      Corrected Backsight Inclinations
+                    </FormLabel>
+                  )}
+                />
               </Box>
               <Field
                 name="pageImages"
