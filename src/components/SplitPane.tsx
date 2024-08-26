@@ -1,6 +1,6 @@
-import { Box, SxProps } from "@mui/material";
-import * as React from "react";
-import useMouseDrag from "./useMouseDrag";
+import { Box } from '@mui/material'
+import * as React from 'react'
+import useMouseDrag from './useMouseDrag'
 
 export function SplitPane({
   sx,
@@ -9,38 +9,38 @@ export function SplitPane({
   ...rest
 }: React.ComponentProps<typeof Box> & {
   slotProps?: {
-    left?: React.ComponentProps<typeof Box>;
-    right?: React.ComponentProps<typeof Box>;
-  };
+    left?: React.ComponentProps<typeof Box>
+    right?: React.ComponentProps<typeof Box>
+  }
 }) {
-  const children = React.Children.toArray(_children);
-  if (children.length !== 2) throw new Error("must have two children");
-  const [left, right] = children;
+  const children = React.Children.toArray(_children)
+  if (children.length !== 2) throw new Error('must have two children')
+  const [left, right] = children
 
-  const [splitPosition, setSplitPosition] = React.useState(0.5);
-  const rootRef = React.useRef<HTMLDivElement>(null);
+  const [splitPosition, setSplitPosition] = React.useState(0.5)
+  const rootRef = React.useRef<HTMLDivElement>(null)
 
   const onMouseDown = useMouseDrag(
     (e, { dx, dragStartProps: { splitPosition } }) => {
-      const root = rootRef.current;
-      if (!root) return;
-      e.preventDefault();
-      e.stopPropagation();
-      setSplitPosition(splitPosition + dx / root.offsetWidth);
+      const root = rootRef.current
+      if (!root) return
+      e.preventDefault()
+      e.stopPropagation()
+      setSplitPosition(splitPosition + dx / root.offsetWidth)
     },
     { splitPosition }
-  );
+  )
 
   return (
     <Box
       {...rest}
       ref={rootRef}
       sx={{
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "nowrap",
-        overflow: "hidden",
-        alignItems: "stretch",
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'nowrap',
+        overflow: 'hidden',
+        alignItems: 'stretch',
         ...sx,
       }}
     >
@@ -50,9 +50,9 @@ export function SplitPane({
           flexGrow: 0,
           flexShrink: 0,
           minWidth: 0,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "auto",
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto',
           ...slotProps?.left?.sx,
         }}
         style={{
@@ -62,16 +62,16 @@ export function SplitPane({
       >
         {left}
       </Box>
-      <Box sx={{ width: 0, position: "relative" }}>
+      <Box sx={{ width: 0, position: 'relative' }}>
         <Box
           onMouseDown={onMouseDown}
           sx={{
-            position: "absolute",
+            position: 'absolute',
             top: 0,
             bottom: 0,
             left: -4,
             width: 8,
-            cursor: "col-resize",
+            cursor: 'col-resize',
           }}
         />
       </Box>
@@ -82,14 +82,14 @@ export function SplitPane({
           flexGrow: 1,
           flexShrink: 1,
           flexBasis: 0,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "auto",
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto',
           ...slotProps?.right?.sx,
         }}
       >
         {right}
       </Box>
     </Box>
-  );
+  )
 }

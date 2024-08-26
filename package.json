@@ -1,16 +1,17 @@
 {
   "name": "@speleotica/cave-survey-data-entry",
-  "version": "5.0.0",
+  "version": "0.0.0-development",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "cross-env NEXT_BASE_PATH=/cave-survey-data-entry next build",
-    "start": "next start",
-    "lint": "next lint",
-    "post-update": "echo \"codesandbox preview only, need an update\" && pnpm update --latest",
-    "deploy": "pnpm build && gh-pages -d out -t true"
+    "dev": "rsbuild dev --open",
+    "deploy": "pnpm build && gh-pages -d dist -t true",
+    "tc": "toolchain",
+    "toolchain": "toolchain",
+    "test": "toolchain test",
+    "prepublishOnly": "echo This package is meant to be published by semantic-release from the dist build directory. && exit 1"
   },
   "dependencies": {
+    "@babel/runtime": "^7.18.6",
     "@emotion/cache": "latest",
     "@emotion/css": "^11.11.2",
     "@emotion/react": "latest",
@@ -18,25 +19,52 @@
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "latest",
     "@mui/material-nextjs": "latest",
-    "@speleotica/frcsdata": "^4.2.0",
+    "@speleotica/frcsdata": "^4.3.0",
     "@speleotica/unitized": "^2.0.0",
+    "@tanstack/react-query": "^5.52.1",
     "final-form": "^4.20.10",
+    "idb": "^8.0.0",
     "lodash": "^4.17.21",
-    "next": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-final-form": "^6.5.9",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@jcoreio/eslint-plugin-implicit-dependencies": "^1.1.1",
+    "@jcoreio/toolchain": "^4.6.1",
+    "@jcoreio/toolchain-circle": "^4.6.1",
+    "@jcoreio/toolchain-esnext": "^4.6.1",
+    "@jcoreio/toolchain-react": "^4.6.1",
+    "@jcoreio/toolchain-typescript": "^4.6.1",
+    "@rsbuild/core": "1.0.1-beta.16",
+    "@rsbuild/plugin-react": "1.0.1-beta.16",
     "@types/lodash": "^4.17.4",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@typescript-eslint/eslint-plugin": "^7.6.0",
+    "@typescript-eslint/parser": "^7.6.0",
     "cross-env": "^7.0.3",
-    "eslint": "latest",
+    "eslint": "^8.56.0",
     "eslint-config-next": "latest",
+    "eslint-plugin-react": "^7.32.2",
     "gh-pages": "^6.1.1",
     "typescript": "latest"
-  }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=16"
+  },
+  "packageManager": "pnpm@8.11.0"
 }

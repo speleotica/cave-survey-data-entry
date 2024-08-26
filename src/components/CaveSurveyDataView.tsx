@@ -1,52 +1,84 @@
-"use client";
-import * as React from "react";
-import Box from "@mui/material/Box";
+import * as React from 'react'
+import Box from '@mui/material/Box'
 import {
   Field,
   FieldRenderProps,
   Form,
   FormSpy,
   useField,
-} from "react-final-form";
-import { OutputField } from "./OutputField";
-import { SurveySheetsField } from "./SurveySheetsField";
-import { PageImage, Shot, Values } from "./types";
-import { throttle } from "lodash";
-import { Button, FormLabel, MenuItem, Switch, TextField } from "@mui/material";
-import { FormState } from "final-form";
-import { SplitPane } from "./SplitPane";
+} from 'react-final-form'
+import { OutputField } from './OutputField'
+import { SurveySheetsField } from './SurveySheetsField'
+import { PageImage, Values } from './types'
+import throttle from 'lodash/throttle'
+import { Button, FormLabel, MenuItem, Switch, TextField } from '@mui/material'
+import { FormState } from 'final-form'
+import { SplitPane } from './SplitPane'
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query'
+import { createIdb, Idb } from '@/idb/idb'
+import { IdbProvider, useIdb } from './IdbContext'
+
+const queryClient = new QueryClient()
 
 export default function Home() {
+  const [idb, setIdb] = React.useState<Idb>()
+  createIdb().then(setIdb)
+
+  if (!idb) {
+    return 'Loading...'
+  }
+
+  return (
+    <IdbProvider idb={idb}>
+      <QueryClientProvider client={queryClient}>
+        <Home2 />
+      </QueryClientProvider>
+    </IdbProvider>
+  )
+}
+
+function Home2() {
+  const idb = useIdb()
+
   const handleSubmit = React.useCallback((values: any) => {
-    console.log(values);
-  }, []);
+    // eslint-disable-next-line no-console
+    console.log(values)
+  }, [])
+
+  const { data: pageImages } = useQuery({
+    queryKey: ['pageImages'],
+    queryFn: () => idb.getAll('pageImages'),
+  })
 
   const initialValues = React.useMemo((): Values | undefined => {
+    if (!pageImages) return undefined
     try {
       return Values.parse({
-        pageImages: JSON.parse(
-          localStorage.getItem("caveSurveyDataPageImages") || ""
-        ),
-        ...JSON.parse(localStorage.getItem("caveSurveyDataValues") || ""),
-      });
+        pageImages: pageImages.sort((a, b) => a.index - b.index),
+        ...JSON.parse(localStorage.getItem('caveSurveyDataValues') || ''),
+      })
     } catch (error) {
       return {
         pageImages: [],
         shots: [],
         backsightAzimuthCorrected: true,
         backsightInclinationCorrected: true,
-      };
+      }
     }
-  }, []);
+  }, [pageImages])
 
   return (
     <Form<Values> initialValues={initialValues} onSubmit={handleSubmit}>
-      {(props) => (
+      {() => (
         <>
           <PersistData />
           <SplitPane
             sx={{
-              position: "fixed",
+              position: 'fixed',
               top: 0,
               left: 0,
               right: 0,
@@ -64,18 +96,18 @@ export default function Home() {
               sx={{
                 flexGrow: 1,
                 flexShrink: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                overflow: "hidden",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                overflow: 'hidden',
               }}
             >
-              <Box sx={{ display: "flex", flexDirection: "row", gap: 1 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
                 <ClearDataButton />
                 <ClearAllButton />
               </Box>
               <Box
-                sx={{ display: "flex", flexDirection: "row", gap: 4, mb: 2 }}
+                sx={{ display: 'flex', flexDirection: 'row', gap: 4, mb: 2 }}
               >
                 <Field
                   name="backsightAzimuthCorrected"
@@ -107,9 +139,9 @@ export default function Home() {
             </Box>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "stretch",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
               }}
             >
               <TextField label="Format" select value="frcs" fullWidth>
@@ -124,64 +156,72 @@ export default function Home() {
         </>
       )}
     </Form>
-  );
+  )
 }
 
 function ClearDataButton() {
   const {
     input: { onChange },
-  } = useField("shots");
+  } = useField('shots')
   return (
     <Button
       onClick={() => {
-        onChange([]);
+        onChange([])
       }}
     >
       Clear Data
     </Button>
-  );
+  )
 }
 
 function ClearAllButton() {
-  const shots = useField("shots");
-  const pageImages = useField("pageImages");
+  const shots = useField('shots')
+  const pageImages = useField('pageImages')
   return (
     <Button
       onClick={() => {
-        shots.input.onChange([]);
-        pageImages.input.onChange([]);
+        shots.input.onChange([])
+        pageImages.input.onChange([])
       }}
     >
       Clear All
     </Button>
-  );
+  )
 }
 
 function PersistData() {
-  const lastValues = React.useRef<Values | undefined>(undefined);
+  const idb = useIdb()
+
+  const lastValues = React.useRef<Values | undefined>(undefined)
 
   const handleChange = React.useMemo(
     () =>
       throttle(({ values }: FormState<Values>) => {
         if (values.pageImages !== lastValues.current?.pageImages) {
-          localStorage.setItem(
-            "caveSurveyDataPageImages",
-            JSON.stringify(values.pageImages)
-          );
+          idb.clear('pageImages')
+          let index = 0
+          for (const image of values.pageImages || []) {
+            if (image) idb.put('pageImages', { ...image, index }, index)
+            index++
+          }
         }
         if (
           (Object.keys(values) as (keyof Values)[]).some(
             (key) =>
-              key !== "pageImages" && values[key] !== lastValues.current?.[key]
+              key !== 'pageImages' && values[key] !== lastValues.current?.[key]
           )
         ) {
-          const { pageImages, ...rest } = values;
-          localStorage.setItem("caveSurveyDataValues", JSON.stringify(rest));
+          const {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            pageImages,
+            ...rest
+          } = values
+          localStorage.setItem('caveSurveyDataValues', JSON.stringify(rest))
         }
-        lastValues.current = values;
+        lastValues.current = values
       }, 500),
     []
-  );
+  )
 
-  return <FormSpy subscription={{ values: true }} onChange={handleChange} />;
+  return <FormSpy subscription={{ values: true }} onChange={handleChange} />
 }

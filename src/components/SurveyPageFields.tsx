@@ -5,55 +5,55 @@ import {
   SxProps,
   TextField,
   Tooltip,
-} from "@mui/material";
-import * as React from "react";
-import { LayoutVariant } from "./types";
-import { ViewStream, Error } from "@mui/icons-material";
+} from '@mui/material'
+import * as React from 'react'
+import { LayoutVariant } from './types'
+import { ViewStream, Error } from '@mui/icons-material'
 
 type UseFieldProps = (index: number) => React.ComponentProps<
   typeof TextField
 > & {
-  validationError?: React.ReactNode;
-};
+  validationError?: React.ReactNode
+}
 
 type UseStationAndLrudFieldProps = {
-  station?: UseFieldProps;
-  left?: UseFieldProps;
-  right?: UseFieldProps;
-  up?: UseFieldProps;
-  down?: UseFieldProps;
-};
+  station?: UseFieldProps
+  left?: UseFieldProps
+  right?: UseFieldProps
+  up?: UseFieldProps
+  down?: UseFieldProps
+}
 
 type UseFieldPropsMap = {
-  from?: UseStationAndLrudFieldProps;
-  to?: UseStationAndLrudFieldProps;
-  isSplit?: UseFieldProps;
-  distance?: UseFieldProps;
-  frontsightAzimuth?: UseFieldProps;
-  backsightAzimuth?: UseFieldProps;
-  frontsightInclination?: UseFieldProps;
-  backsightInclination?: UseFieldProps;
-  notes?: UseFieldProps;
-};
+  from?: UseStationAndLrudFieldProps
+  to?: UseStationAndLrudFieldProps
+  isSplit?: UseFieldProps
+  distance?: UseFieldProps
+  frontsightAzimuth?: UseFieldProps
+  backsightAzimuth?: UseFieldProps
+  frontsightInclination?: UseFieldProps
+  backsightInclination?: UseFieldProps
+  notes?: UseFieldProps
+}
 
 export const SurveyPageFields = React.memo(function SurveyPageFields({
   startIndex = 0,
   useFieldProps,
-  layoutVariant = "IMO",
+  layoutVariant = 'IMO',
 }: {
-  startIndex?: number;
-  useFieldProps?: UseFieldPropsMap;
-  layoutVariant?: LayoutVariant;
+  startIndex?: number
+  useFieldProps?: UseFieldPropsMap
+  layoutVariant?: LayoutVariant
 }) {
-  const numRows = 11;
+  const numRows = 11
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        width: "100%",
-        height: "100%",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        width: '100%',
+        height: '100%',
       }}
     >
       {[...Array(numRows).keys()].map((index) => (
@@ -69,10 +69,10 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
         />
       ))}
     </Box>
-  );
-});
+  )
+})
 
-const lrudDirs = ["left", "right", "up", "down"] as const;
+const lrudDirs = ['left', 'right', 'up', 'down'] as const
 
 const SurveyRow = ({
   sx,
@@ -81,36 +81,35 @@ const SurveyRow = ({
   includeShotFields = true,
   layoutVariant,
 }: {
-  sx?: SxProps;
-  index: number;
-  layoutVariant: LayoutVariant;
-  useFieldProps?: UseFieldPropsMap;
-  includeShotFields?: boolean;
+  sx?: SxProps
+  index: number
+  layoutVariant: LayoutVariant
+  useFieldProps?: UseFieldPropsMap
+  includeShotFields?: boolean
 }) => {
-  const prevSplit = useFieldProps?.isSplit?.(index - 1)?.value === true;
-  const isSplitProps = useFieldProps?.isSplit?.(index);
-  const isSplit = isSplitProps?.value === true;
-  const nextSplit = useFieldProps?.isSplit?.(index + 1)?.value === true;
+  const isSplitProps = useFieldProps?.isSplit?.(index)
+  const isSplit = isSplitProps?.value === true
+  const nextSplit = useFieldProps?.isSplit?.(index + 1)?.value === true
 
   const stationSx = {
-    position: "relative",
+    position: 'relative',
     flexGrow: 0,
     flexShrink: 0,
-    flexBasis: layoutVariant === "Lech" ? "19%" : "16%",
-    "&:not(:hover) > :nth-child(1)": {
-      visibility: "hidden",
+    flexBasis: layoutVariant === 'Lech' ? '19%' : '16%',
+    '&:not(:hover) > :nth-child(1)': {
+      visibility: 'hidden',
     },
-  } as const;
+  } as const
   return (
     <Box
       sx={{
         ...sx,
         flexGrow: 1,
         flexShrink: 1,
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "nowrap",
-        alignItems: "stretch",
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'nowrap',
+        alignItems: 'stretch',
       }}
     >
       {isSplit ? (
@@ -120,8 +119,8 @@ const SurveyRow = ({
               size="small"
               tabIndex={-1}
               sx={{
-                position: "absolute",
-                top: "50%",
+                position: 'absolute',
+                top: '50%',
                 left: 0,
                 mt: -2,
                 ml: -2,
@@ -139,10 +138,10 @@ const SurveyRow = ({
             useFieldProps={useFieldProps?.to?.station}
             field="to.station"
             above={{
-              field: "from.station",
+              field: 'from.station',
               index: index - 1,
             }}
-            below={{ field: "from.station", index }}
+            below={{ field: 'from.station', index }}
             right="distance"
           />
           <SurveyTextField
@@ -150,10 +149,10 @@ const SurveyRow = ({
             useFieldProps={useFieldProps?.from?.station}
             field="from.station"
             below={{
-              field: nextSplit ? "to.station" : "from.station",
+              field: nextSplit ? 'to.station' : 'from.station',
               index: index + 1,
             }}
-            above={{ field: "to.station", index }}
+            above={{ field: 'to.station', index }}
             right="distance"
           />
         </VerticalSplit>
@@ -161,7 +160,7 @@ const SurveyRow = ({
         <Box
           sx={{
             ...stationSx,
-            display: "flex",
+            display: 'flex',
           }}
         >
           <Tooltip title="Split row" placement="right">
@@ -169,8 +168,8 @@ const SurveyRow = ({
               size="small"
               tabIndex={-1}
               sx={{
-                position: "absolute",
-                top: "50%",
+                position: 'absolute',
+                top: '50%',
                 left: 0,
                 mt: -2,
                 ml: -2,
@@ -188,11 +187,11 @@ const SurveyRow = ({
             useFieldProps={useFieldProps?.from?.station}
             field="from.station"
             above={{
-              field: "from.station",
+              field: 'from.station',
               index: index - 1,
             }}
             below={{
-              field: nextSplit ? "to.station" : "from.station",
+              field: nextSplit ? 'to.station' : 'from.station',
               index: index + 1,
             }}
             right="distance"
@@ -201,23 +200,23 @@ const SurveyRow = ({
       )}
       <Box
         sx={{
-          position: "relative",
+          position: 'relative',
           flexGrow: 0,
           flexShrink: 0,
-          flexBasis: layoutVariant === "Lech" ? "37.5%" : "40%",
-          pointerEvents: "none",
+          flexBasis: layoutVariant === 'Lech' ? '37.5%' : '40%',
+          pointerEvents: 'none',
         }}
       >
         {includeShotFields && (
           <Box
             sx={{
-              position: "absolute",
-              top: "50%",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "stretch",
-              pointerEvents: "all",
+              position: 'absolute',
+              top: '50%',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'stretch',
+              pointerEvents: 'all',
             }}
           >
             <SurveyTextField
@@ -243,8 +242,8 @@ const SurveyRow = ({
                 index={index}
                 field="frontsightAzimuth"
                 useFieldProps={useFieldProps?.frontsightAzimuth}
-                above={{ field: "backsightAzimuth", index: index - 1 }}
-                below={{ field: "backsightAzimuth", index }}
+                above={{ field: 'backsightAzimuth', index: index - 1 }}
+                below={{ field: 'backsightAzimuth', index }}
                 left="distance"
                 right="frontsightInclination"
               />
@@ -252,8 +251,8 @@ const SurveyRow = ({
                 index={index}
                 field="backsightAzimuth"
                 useFieldProps={useFieldProps?.backsightAzimuth}
-                above={{ field: "frontsightAzimuth", index }}
-                below={{ field: "frontsightAzimuth", index: index + 1 }}
+                above={{ field: 'frontsightAzimuth', index }}
+                below={{ field: 'frontsightAzimuth', index: index + 1 }}
                 left="distance"
                 right="backsightInclination"
               />
@@ -269,8 +268,8 @@ const SurveyRow = ({
                 index={index}
                 field="frontsightInclination"
                 useFieldProps={useFieldProps?.frontsightInclination}
-                above={{ field: "backsightInclination", index: index - 1 }}
-                below={{ field: "backsightInclination", index }}
+                above={{ field: 'backsightInclination', index: index - 1 }}
+                below={{ field: 'backsightInclination', index }}
                 left="frontsightAzimuth"
                 right="from.left"
               />
@@ -278,11 +277,11 @@ const SurveyRow = ({
                 index={index}
                 field="backsightInclination"
                 useFieldProps={useFieldProps?.backsightInclination}
-                above={{ field: "frontsightInclination", index }}
-                below={{ field: "frontsightInclination", index: index + 1 }}
+                above={{ field: 'frontsightInclination', index }}
+                below={{ field: 'frontsightInclination', index: index + 1 }}
                 left="backsightAzimuth"
                 right={{
-                  field: nextSplit ? "to.left" : "from.left",
+                  field: nextSplit ? 'to.left' : 'from.left',
                   index: index + 1,
                 }}
               />
@@ -295,10 +294,10 @@ const SurveyRow = ({
           flexBasis: 0,
           flexGrow: 1,
           flexShrink: 1,
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "nowrap",
-          alignItems: "stretch",
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'nowrap',
+          alignItems: 'stretch',
         }}
       >
         {lrudDirs.map((dir, lrudIndex) =>
@@ -313,10 +312,10 @@ const SurveyRow = ({
                 left={
                   lrudIndex > 0
                     ? `to.${lrudDirs[lrudIndex - 1]}`
-                    : { field: "backsightInclination", index: index - 1 }
+                    : { field: 'backsightInclination', index: index - 1 }
                 }
                 right={
-                  lrudIndex < 3 ? `to.${lrudDirs[lrudIndex + 1]}` : "notes"
+                  lrudIndex < 3 ? `to.${lrudDirs[lrudIndex + 1]}` : 'notes'
                 }
               />
               <SurveyTextField
@@ -331,10 +330,10 @@ const SurveyRow = ({
                 left={
                   lrudIndex > 0
                     ? `from.${lrudDirs[lrudIndex - 1]}`
-                    : "frontsightInclination"
+                    : 'frontsightInclination'
                 }
                 right={
-                  lrudIndex < 3 ? `from.${lrudDirs[lrudIndex + 1]}` : "notes"
+                  lrudIndex < 3 ? `from.${lrudDirs[lrudIndex + 1]}` : 'notes'
                 }
               />
             </VerticalSplit>
@@ -355,10 +354,10 @@ const SurveyRow = ({
               left={
                 lrudIndex > 0
                   ? `from.${lrudDirs[lrudIndex - 1]}`
-                  : "frontsightInclination"
+                  : 'frontsightInclination'
               }
               right={
-                lrudIndex < 3 ? `from.${lrudDirs[lrudIndex + 1]}` : "notes"
+                lrudIndex < 3 ? `from.${lrudDirs[lrudIndex + 1]}` : 'notes'
               }
             />
           )
@@ -370,60 +369,60 @@ const SurveyRow = ({
           sx={{
             flexGrow: 0,
             flexShrink: 0,
-            flexBasis: layoutVariant === "Lech" ? "43%" : "30%",
+            flexBasis: layoutVariant === 'Lech' ? '43%' : '30%',
           }}
           left="from.down"
         />
       </Box>
     </Box>
-  );
-};
+  )
+}
 
 function VerticalSplit({
   sx,
   children,
 }: {
-  sx?: SxProps;
-  children?: React.ReactNode;
+  sx?: SxProps
+  children?: React.ReactNode
 }) {
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
         ...sx,
       }}
     >
       {children}
     </Box>
-  );
+  )
 }
 
 type FieldType =
-  | "from.station"
-  | "from.left"
-  | "from.right"
-  | "from.up"
-  | "from.down"
-  | "distance"
-  | "frontsightAzimuth"
-  | "backsightAzimuth"
-  | "frontsightInclination"
-  | "backsightInclination"
-  | "to.station"
-  | "to.left"
-  | "to.right"
-  | "to.up"
-  | "to.down"
-  | "notes";
+  | 'from.station'
+  | 'from.left'
+  | 'from.right'
+  | 'from.up'
+  | 'from.down'
+  | 'distance'
+  | 'frontsightAzimuth'
+  | 'backsightAzimuth'
+  | 'frontsightInclination'
+  | 'backsightInclination'
+  | 'to.station'
+  | 'to.left'
+  | 'to.right'
+  | 'to.up'
+  | 'to.down'
+  | 'notes'
 
 type FieldReference =
   | FieldType
   | {
-      field: FieldType;
-      index: number;
-    };
+      field: FieldType
+      index: number
+    }
 
 const SurveyTextField = ({
   field,
@@ -438,43 +437,43 @@ const SurveyTextField = ({
   InputProps,
   ...props
 }: React.ComponentProps<typeof TextField> & {
-  field: FieldType;
-  above?: FieldReference;
-  below?: FieldReference;
-  left?: FieldReference;
-  right?: FieldReference;
-  index: number;
-  useFieldProps?: UseFieldProps;
+  field: FieldType
+  above?: FieldReference
+  below?: FieldReference
+  left?: FieldReference
+  right?: FieldReference
+  index: number
+  useFieldProps?: UseFieldProps
 }) => {
-  const { validationError, ...fieldProps } = useFieldProps?.(index) || {};
+  const { validationError, ...fieldProps } = useFieldProps?.(index) || {}
 
   const onKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
-      let ref: FieldReference | undefined;
+      let ref: FieldReference | undefined
       const input =
-        event.target instanceof HTMLInputElement ? event.target : undefined;
+        event.target instanceof HTMLInputElement ? event.target : undefined
       switch (event.key) {
-        case "ArrowUp":
-          event.preventDefault();
-          ref = above;
-          break;
-        case "ArrowDown":
-          event.preventDefault();
-          ref = below;
-          break;
-        case "ArrowLeft":
+        case 'ArrowUp':
+          event.preventDefault()
+          ref = above
+          break
+        case 'ArrowDown':
+          event.preventDefault()
+          ref = below
+          break
+        case 'ArrowLeft':
           if (input?.selectionStart === 0) {
-            ref = left;
+            ref = left
           }
-          break;
-        case "ArrowRight":
+          break
+        case 'ArrowRight':
           if (input && input.selectionEnd === input.value?.length) {
-            ref = right;
+            ref = right
           }
-          break;
+          break
       }
       const otherInput =
-        typeof ref === "string"
+        typeof ref === 'string'
           ? document.querySelector(
               `[data-field="${ref}"][data-index="${index}"]`
             )
@@ -482,15 +481,15 @@ const SurveyTextField = ({
           ? document.querySelector(
               `[data-field="${ref.field}"][data-index="${ref.index}"]`
             )
-          : undefined;
+          : undefined
       if (otherInput instanceof HTMLInputElement) {
-        event.preventDefault();
-        otherInput.focus();
-        otherInput.select();
+        event.preventDefault()
+        otherInput.focus()
+        otherInput.select()
       }
     },
     [field, index]
-  );
+  )
 
   return (
     <TextField
@@ -501,44 +500,43 @@ const SurveyTextField = ({
       sx={{
         flexGrow: 1,
         flexShrink: 1,
-        flexBasis: "10%",
+        flexBasis: '10%',
         backgroundColor: fieldProps?.value
-          ? "rgba(255, 255, 255, 0.8)"
-          : "none",
-        "& input": {
-          padding: "2px",
-          textAlign: "center",
+          ? 'rgba(255, 255, 255, 0.8)'
+          : 'none',
+        '& input': {
+          padding: '2px',
+          textAlign: 'center',
         },
         ...sx,
       }}
       inputProps={{
-        "data-field": field,
-        "data-index": index,
+        'data-field': field,
+        'data-index': index,
         ...inputProps,
       }}
       InputProps={{
         ...InputProps,
         sx: {
           borderRadius: 0,
-          height: "100%",
-          fontSize: "0.8rem",
+          height: '100%',
+          fontSize: '0.8rem',
           ...InputProps?.sx,
         },
         endAdornment: validationError ? (
           <InputAdornment position="end" sx={{ mr: -1.5 }}>
             <Tooltip title={validationError}>
-              <Error sx={{ color: "red", height: 16, width: 16 }} />
+              <Error sx={{ color: 'red', height: 16, width: 16 }} />
             </Tooltip>
           </InputAdornment>
         ) : undefined,
       }}
     />
-  );
-};
+  )
+}
 
 const AngleField = ({
   sx,
-  inputProps,
   InputProps,
   ...props
 }: React.ComponentProps<typeof SurveyTextField>) => {
@@ -554,10 +552,10 @@ const AngleField = ({
       InputProps={{
         ...InputProps,
         sx: {
-          height: "100%",
+          height: '100%',
           ...InputProps?.sx,
         },
       }}
     />
-  );
-};
+  )
+}

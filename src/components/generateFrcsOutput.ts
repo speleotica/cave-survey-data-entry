@@ -1,29 +1,29 @@
-import { Values } from "./types";
-import { UnitizedNumber, Length, Angle, Unitize } from "@speleotica/unitized";
-import { FrcsShot, FrcsShotKind } from "@speleotica/frcsdata/FrcsShot";
-import { FrcsTripHeader, formatFrcsShot } from "@speleotica/frcsdata";
-import { parseNumber } from "./parseNumber";
+import { Values } from './types'
+import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
+import { FrcsShot, FrcsShotKind } from '@speleotica/frcsdata/FrcsShot'
+import { FrcsTripHeader, formatFrcsShot } from '@speleotica/frcsdata'
+import { parseNumber } from './parseNumber'
 
 export function generateFrcsOutput({ shots }: Values): string {
-  if (!shots) return "";
+  if (!shots) return ''
   const header: FrcsTripHeader = {
-    name: "Trip",
+    name: 'Trip',
     distanceUnit: Length.feet,
     azimuthUnit: Angle.degrees,
     inclinationUnit: Angle.degrees,
-  };
-  const frcsShots: FrcsShot[] = [];
+  }
+  const frcsShots: FrcsShot[] = []
   for (let i = 0; i < shots.length - 1; i++) {
-    const from = shots[i]?.from?.station;
-    if (!from) continue;
-    let excludeDistance = false;
-    let rawDistance = shots[i]?.distance;
+    const from = shots[i]?.from?.station
+    if (!from) continue
+    let excludeDistance = false
+    let rawDistance = shots[i]?.distance
     if (rawDistance != null && /\*\s*$/.test(rawDistance)) {
-      excludeDistance = true;
-      rawDistance = rawDistance.replace(/\*\s*$/, "");
+      excludeDistance = true
+      rawDistance = rawDistance.replace(/\*\s*$/, '')
     }
-    const distance = parseDistance(rawDistance);
-    if (!distance) continue;
+    const distance = parseDistance(rawDistance)
+    if (!distance) continue
     frcsShots.push({
       from,
       to: shots[i + 1]?.isSplit
@@ -56,21 +56,21 @@ export function generateFrcsOutput({ shots }: Values): string {
             down: parseDistance(shots[i + 1]?.from?.down),
           },
       comment: shots[i + 1]?.notes,
-    });
+    })
   }
-  return frcsShots.map((shot) => formatFrcsShot(shot, header)).join("\n");
+  return frcsShots.map((shot) => formatFrcsShot(shot, header)).join('\n')
 }
 
 function parseDistance(
   value: string | undefined
 ): UnitizedNumber<Length> | undefined {
-  const num = parseNumber(value);
-  return num != null ? Unitize.feet(num) : undefined;
+  const num = parseNumber(value)
+  return num != null ? Unitize.feet(num) : undefined
 }
 
 function parseAngle(
   value: string | undefined
 ): UnitizedNumber<Angle> | undefined {
-  const num = parseNumber(value);
-  return num != null ? Unitize.degrees(num) : undefined;
+  const num = parseNumber(value)
+  return num != null ? Unitize.degrees(num) : undefined
 }
