@@ -22,7 +22,12 @@ export const Shot = z.object({
 })
 
 export type LayoutVariant = z.output<typeof LayoutVariant>
-export const LayoutVariant = z.enum(['IMO', 'Lech'])
+export const LayoutVariant = z.enum([
+  'IMO',
+  'Lech',
+  'FromStaDisAzIncLrUd',
+  'ToStaDisAzIncLrUd',
+])
 
 export type PageImage = z.output<typeof PageImage>
 export const PageImage = z.object({

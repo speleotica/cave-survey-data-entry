@@ -45,7 +45,11 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
   useFieldProps?: UseFieldPropsMap
   layoutVariant?: LayoutVariant
 }) {
-  const numRows = 11
+  const numRows =
+    layoutVariant === 'FromStaDisAzIncLrUd' ||
+    layoutVariant === 'ToStaDisAzIncLrUd'
+      ? 26
+      : 11
   return (
     <Box
       sx={{
@@ -88,8 +92,12 @@ const SurveyRow = ({
   includeShotFields?: boolean
 }) => {
   const isSplitProps = useFieldProps?.isSplit?.(index)
-  const isSplit = isSplitProps?.value === true
+  const isSimpleGrid =
+    layoutVariant === 'FromStaDisAzIncLrUd' ||
+    layoutVariant === 'ToStaDisAzIncLrUd'
+  const isSplit = isSimpleGrid ? false : isSplitProps?.value === true
   const nextSplit = useFieldProps?.isSplit?.(index + 1)?.value === true
+  const stationIndex = layoutVariant === 'ToStaDisAzIncLrUd' ? index + 1 : index
 
   const stationSx = {
     position: 'relative',
@@ -113,7 +121,7 @@ const SurveyRow = ({
       }}
     >
       {isSplit ? (
-        <VerticalSplit sx={stationSx}>
+        <Split sx={stationSx}>
           <Tooltip title="Unsplit row" placement="right">
             <Fab
               size="small"
@@ -155,7 +163,7 @@ const SurveyRow = ({
             above={{ field: 'to.station', index }}
             right="distance"
           />
-        </VerticalSplit>
+        </Split>
       ) : (
         <Box
           sx={{
@@ -163,36 +171,40 @@ const SurveyRow = ({
             display: 'flex',
           }}
         >
-          <Tooltip title="Split row" placement="right">
-            <Fab
-              size="small"
-              tabIndex={-1}
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: 0,
-                mt: -2,
-                ml: -2,
-                height: 32,
-                width: 32,
-                minHeight: 32,
-              }}
-              onClick={() => isSplitProps?.onChange?.(true as any)}
-            >
-              <ViewStream />
-            </Fab>
-          </Tooltip>
+          {isSimpleGrid ? (
+            <span />
+          ) : (
+            <Tooltip title="Split row" placement="right">
+              <Fab
+                size="small"
+                tabIndex={-1}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  mt: -2,
+                  ml: -2,
+                  height: 32,
+                  width: 32,
+                  minHeight: 32,
+                }}
+                onClick={() => isSplitProps?.onChange?.(true as any)}
+              >
+                <ViewStream />
+              </Fab>
+            </Tooltip>
+          )}
           <SurveyTextField
-            index={index}
+            index={stationIndex}
             useFieldProps={useFieldProps?.from?.station}
             field="from.station"
             above={{
               field: 'from.station',
-              index: index - 1,
+              index: stationIndex - 1,
             }}
             below={{
               field: nextSplit ? 'to.station' : 'from.station',
-              index: index + 1,
+              index: stationIndex + 1,
             }}
             right="distance"
           />
@@ -203,7 +215,8 @@ const SurveyRow = ({
           position: 'relative',
           flexGrow: 0,
           flexShrink: 0,
-          flexBasis: layoutVariant === 'Lech' ? '37.5%' : '40%',
+          flexBasis:
+            layoutVariant === 'Lech' ? '37.5%' : isSimpleGrid ? '50%' : '40%',
           pointerEvents: 'none',
         }}
       >
@@ -211,7 +224,7 @@ const SurveyRow = ({
           <Box
             sx={{
               position: 'absolute',
-              top: '50%',
+              top: isSimpleGrid ? '0%' : '50%',
               width: '100%',
               height: '100%',
               display: 'flex',
@@ -231,11 +244,12 @@ const SurveyRow = ({
                 flexShrink: 1,
               }}
             />
-            <VerticalSplit
+            <Split
               sx={{
                 flexBasis: 0,
                 flexGrow: 1,
                 flexShrink: 1,
+                flexDirection: isSimpleGrid ? 'row' : 'column',
               }}
             >
               <AngleField
@@ -256,12 +270,13 @@ const SurveyRow = ({
                 left="distance"
                 right="backsightInclination"
               />
-            </VerticalSplit>
-            <VerticalSplit
+            </Split>
+            <Split
               sx={{
                 flexBasis: 0,
                 flexGrow: 1,
                 flexShrink: 1,
+                flexDirection: isSimpleGrid ? 'row' : 'column',
               }}
             >
               <AngleField
@@ -285,7 +300,7 @@ const SurveyRow = ({
                   index: index + 1,
                 }}
               />
-            </VerticalSplit>
+            </Split>
           </Box>
         )}
       </Box>
@@ -302,17 +317,17 @@ const SurveyRow = ({
       >
         {lrudDirs.map((dir, lrudIndex) =>
           isSplit ? (
-            <VerticalSplit key={dir}>
+            <Split key={dir}>
               <SurveyTextField
                 index={index}
                 field={`to.${dir}`}
                 useFieldProps={useFieldProps?.to?.[dir]}
-                above={{ field: `from.${dir}`, index: index - 1 }}
-                below={{ field: `from.${dir}`, index }}
+                above={{ field: `from.${dir}`, index: stationIndex - 1 }}
+                below={{ field: `from.${dir}`, index: stationIndex }}
                 left={
                   lrudIndex > 0
                     ? `to.${lrudDirs[lrudIndex - 1]}`
-                    : { field: 'backsightInclination', index: index - 1 }
+                    : { field: 'backsightInclination', index: stationIndex - 1 }
                 }
                 right={
                   lrudIndex < 3 ? `to.${lrudDirs[lrudIndex + 1]}` : 'notes'
@@ -322,10 +337,10 @@ const SurveyRow = ({
                 index={index}
                 field={`from.${dir}`}
                 useFieldProps={useFieldProps?.from?.[dir]}
-                above={{ field: `to.${dir}`, index }}
+                above={{ field: `to.${dir}`, index: stationIndex }}
                 below={{
                   field: nextSplit ? `to.${dir}` : `from.${dir}`,
-                  index: index + 1,
+                  index: stationIndex + 1,
                 }}
                 left={
                   lrudIndex > 0
@@ -336,20 +351,20 @@ const SurveyRow = ({
                   lrudIndex < 3 ? `from.${lrudDirs[lrudIndex + 1]}` : 'notes'
                 }
               />
-            </VerticalSplit>
+            </Split>
           ) : (
             <SurveyTextField
               key={dir}
-              index={index}
+              index={stationIndex}
               field={`from.${dir}`}
               useFieldProps={useFieldProps?.from?.[dir]}
               above={{
                 field: `from.${dir}`,
-                index: index - 1,
+                index: stationIndex - 1,
               }}
               below={{
                 field: nextSplit ? `to.${dir}` : `from.${dir}`,
-                index: index + 1,
+                index: stationIndex + 1,
               }}
               left={
                 lrudIndex > 0
@@ -362,29 +377,25 @@ const SurveyRow = ({
             />
           )
         )}
-        <SurveyTextField
-          index={index}
-          field="notes"
-          useFieldProps={useFieldProps?.notes}
-          sx={{
-            flexGrow: 0,
-            flexShrink: 0,
-            flexBasis: layoutVariant === 'Lech' ? '43%' : '30%',
-          }}
-          left="from.down"
-        />
+        {isSimpleGrid ? undefined : (
+          <SurveyTextField
+            index={index}
+            field="notes"
+            useFieldProps={useFieldProps?.notes}
+            sx={{
+              flexGrow: 0,
+              flexShrink: 0,
+              flexBasis: layoutVariant === 'Lech' ? '43%' : '30%',
+            }}
+            left="from.down"
+          />
+        )}
       </Box>
     </Box>
   )
 }
 
-function VerticalSplit({
-  sx,
-  children,
-}: {
-  sx?: SxProps
-  children?: React.ReactNode
-}) {
+function Split({ sx, children }: { sx?: SxProps; children?: React.ReactNode }) {
   return (
     <Box
       sx={{

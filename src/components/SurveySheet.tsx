@@ -249,6 +249,12 @@ export function SurveySheet({ pageIndex = 0 }: { pageIndex?: number }) {
         >
           <MenuItem value="IMO">Inner Mountain Outfitters</MenuItem>
           <MenuItem value="Lech">Lechuguilla</MenuItem>
+          <MenuItem value="FromStaDisAzIncLrUd">
+            From Sta | Dist | Az F/B | Inc F/B | L R | U D
+          </MenuItem>
+          <MenuItem value="ToStaDisAzIncLrUd">
+            To Sta | Dist | Az F/B | Inc F/B | L R | U D
+          </MenuItem>
         </TextField>
         <Fab>
           <Delete />
