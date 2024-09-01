@@ -3,10 +3,11 @@ import Box from '@mui/material/Box'
 import { SurveyPageFields } from './SurveyPageFields'
 import { Values, rectToTableBounds, tableBoundsToRect } from './types'
 import { UseFieldConfig, useField } from 'react-final-form'
-import { ResizableRect } from './ResizableRect'
 import { Fab, MenuItem, TextField } from '@mui/material'
 import { parseNumber } from './parseNumber'
 import { Delete } from '@mui/icons-material'
+import { HomographyBox } from './HomographyBox'
+import { HomographyControlPoints } from './HomographyControlPoints'
 
 const useFieldProps =
   (
@@ -210,23 +211,21 @@ export function SurveySheet({ pageIndex = 0 }: { pageIndex?: number }) {
       <Box sx={{ userSelect: 'none' }}>
         <img src={pageImage.data} alt="survey sheet" height={800} />
       </Box>
-      <Box
-        sx={{
-          ...rectBounds,
-          position: 'absolute',
-        }}
+      <HomographyBox
+        width={350}
+        height={500}
+        bounds={bounds}
+        sx={{ border: '1px solid red' }}
       >
         <SurveyPageFields
           layoutVariant={layoutVariant}
           useFieldProps={useFieldPropsMap}
           startIndex={pageIndex * 11}
         />
-      </Box>
-      <ResizableRect
-        bounds={rectBounds}
-        onResize={(bounds) =>
-          setTable({ ...table, bounds: rectToTableBounds(bounds) })
-        }
+      </HomographyBox>
+      <HomographyControlPoints
+        bounds={bounds}
+        onResize={(bounds) => setTable({ ...table, bounds })}
       />
       <Box
         sx={{

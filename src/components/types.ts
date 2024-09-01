@@ -41,6 +41,7 @@ export const PageImage = z.object({
   data: z.string(),
 })
 
+export type Point = z.output<typeof Point>
 export const Point = z.object({
   x: z.number(),
   y: z.number(),
@@ -83,23 +84,23 @@ export function rectToTableBounds({
 
 export function tableBoundsToRect({
   topLeft,
-  topRight,
-  bottomLeft,
+  // topRight,
+  // bottomLeft,
   bottomRight,
 }: TableBounds): Rect {
-  if (
-    topLeft.x !== bottomLeft.x ||
-    topLeft.y !== topRight.y ||
-    topRight.x !== bottomRight.x ||
-    bottomRight.y !== bottomLeft.y
-  ) {
-    throw new Error(`bounds are non-rectilinear, not supported yet`)
-  }
+  // if (
+  //   topLeft.x !== bottomLeft.x ||
+  //   topLeft.y !== topRight.y ||
+  //   topRight.x !== bottomRight.x ||
+  //   bottomRight.y !== bottomLeft.y
+  // ) {
+  //   throw new Error(`bounds are non-rectilinear, not supported yet`)
+  // }
   return {
     top: topLeft.y,
     left: topLeft.x,
-    width: topRight.x - topLeft.x,
-    height: bottomLeft.y - topLeft.y,
+    width: bottomRight.x - topLeft.x,
+    height: bottomRight.y - topLeft.y,
   }
 }
 
