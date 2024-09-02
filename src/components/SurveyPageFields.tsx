@@ -37,11 +37,9 @@ type UseFieldPropsMap = {
 }
 
 export const SurveyPageFields = React.memo(function SurveyPageFields({
-  startIndex = 0,
   useFieldProps,
   layoutVariant = 'IMO',
 }: {
-  startIndex?: number
   useFieldProps?: UseFieldPropsMap
   layoutVariant?: LayoutVariant
 }) {
@@ -66,7 +64,7 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
             flexBasis: `${100 / numRows}%`,
           }}
           key={index}
-          index={index + startIndex}
+          index={index}
           layoutVariant={layoutVariant}
           useFieldProps={useFieldProps}
           includeShotFields={index < numRows - 1}

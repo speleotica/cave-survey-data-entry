@@ -1,4 +1,3 @@
-import { PageImage } from '@/components/types'
 import { openDB, DBSchema, IDBPDatabase } from 'idb'
 import once from 'lodash/once'
 
@@ -6,8 +5,8 @@ export type Idb = IDBPDatabase<MyDB>
 
 interface MyDB extends DBSchema {
   pageImages: {
-    value: PageImage & { index: number }
-    key: number
+    key: string
+    value: File
   }
 }
 

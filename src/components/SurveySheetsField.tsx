@@ -1,12 +1,15 @@
 import { Box } from '@mui/material'
 import React from 'react'
-import { FieldRenderProps } from 'react-final-form'
 import { SurveySheet } from './SurveySheet'
-import { PageImage } from '../types'
+import { form } from '../form'
+import { useIdb } from './IdbContext'
+import { Page, rectToTableBounds } from '../types'
+import * as uuid from 'uuid'
 
-export function SurveySheetsField({
-  input: { value, onChange },
-}: FieldRenderProps<PageImage[] | undefined>) {
+export function SurveySheetsField() {
+  const { elements, pushRaw } = form.useArrayField('pages')
+
+  const idb = useIdb()
   const handleDragOver = React.useCallback((event: React.DragEvent) => {
     event.preventDefault()
     event.dataTransfer.dropEffect = 'copy'
@@ -15,26 +18,26 @@ export function SurveySheetsField({
     async (event: React.DragEvent) => {
       event.preventDefault()
       const { files } = event.dataTransfer
-      const newPageImages = [...(value || [])]
-      const addedImages = await Promise.all(
-        [...files].map(async (file) => {
-          const data = await new Promise((resolve) => {
-            const reader = new FileReader()
-            reader.onload = () => resolve(reader.result)
-            reader.readAsDataURL(file)
-          })
-          if (typeof data !== 'string')
-            throw new Error(`expected readAsDataURL to produce a string`)
-          return {
-            type: file.type,
-            data,
-          } as const
-        })
-      )
-      for (const img of addedImages) newPageImages.push(img)
-      onChange(newPageImages)
+      for (const file of files) {
+        const imageId = uuid.v1()
+        await idb.add('pageImages', file, imageId)
+        pushRaw({
+          imageId,
+          tables: [
+            {
+              layoutVariant: 'IMO',
+              bounds: rectToTableBounds({
+                top: 113,
+                left: 15,
+                width: 520,
+                height: 632,
+              }),
+            },
+          ],
+        } as Page)
+      }
     },
-    [value]
+    [pushRaw]
   )
 
   return (
@@ -52,10 +55,10 @@ export function SurveySheetsField({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
-      {(value || []).map((pageImage, index) => (
-        <SurveySheet key={index} pageIndex={index} />
+      {elements.map((field, index) => (
+        <SurveySheet key={index} field={field} />
       ))}
-      {!value?.length ? (
+      {!elements.length ? (
         <Box
           sx={{
             height: 200,
