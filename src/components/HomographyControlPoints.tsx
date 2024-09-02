@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { SxProps } from '@mui/material'
 import Box from '@mui/material/Box'
-import useMouseDrag from './useMouseDrag'
-import { Point, TableBounds } from './types'
+import useMouseDrag from '../util/useMouseDrag'
+import { Point, TableBounds } from '../types'
 
 export function HomographyControlPoints({
   handleSize = 9,

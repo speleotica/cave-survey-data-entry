@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from '@mui/material'
 import * as React from 'react'
-import { LayoutVariant } from './types'
+import { LayoutVariant } from '../types'
 import { ViewStream, Error } from '@mui/icons-material'
 
 type UseFieldProps = (index: number) => React.ComponentProps<

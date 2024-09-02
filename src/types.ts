@@ -48,12 +48,7 @@ export const Point = z.object({
 })
 
 export type TableBounds = z.output<typeof TableBounds>
-/**
- * The state is modeled as all four corners of the table in case
- * I decided to support perspective distortion in the future.
- * In practice the rectangle edges can only be vertical and horizontal
- * right now.
- */
+
 export const TableBounds = z.object({
   topLeft: Point,
   topRight: Point,
@@ -79,28 +74,6 @@ export function rectToTableBounds({
     topRight: { x: left + width, y: top },
     bottomLeft: { x: left, y: top + height },
     bottomRight: { x: left + width, y: top + height },
-  }
-}
-
-export function tableBoundsToRect({
-  topLeft,
-  // topRight,
-  // bottomLeft,
-  bottomRight,
-}: TableBounds): Rect {
-  // if (
-  //   topLeft.x !== bottomLeft.x ||
-  //   topLeft.y !== topRight.y ||
-  //   topRight.x !== bottomRight.x ||
-  //   bottomRight.y !== bottomLeft.y
-  // ) {
-  //   throw new Error(`bounds are non-rectilinear, not supported yet`)
-  // }
-  return {
-    top: topLeft.y,
-    left: topLeft.x,
-    width: bottomRight.x - topLeft.x,
-    height: bottomRight.y - topLeft.y,
   }
 }
 

@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import React from 'react'
 import { FieldRenderProps } from 'react-final-form'
 import { SurveySheet } from './SurveySheet'
-import { PageImage } from './types'
+import { PageImage } from '../types'
 
 export function SurveySheetsField({
   input: { value, onChange },

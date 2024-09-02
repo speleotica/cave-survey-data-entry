@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Box } from '@mui/material'
-import { TableBounds } from './types'
+import { TableBounds } from '../types'
 import { calculateHomography } from 'simple-homography'
 
 export function HomographyBox({

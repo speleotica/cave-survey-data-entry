@@ -3,8 +3,8 @@ import { TextField } from '@mui/material'
 import { FormState } from 'final-form'
 import throttle from 'lodash/throttle'
 import { FormSpy } from 'react-final-form'
-import { generateFrcsOutput } from './generateFrcsOutput'
-import { Values } from './types'
+import { generateFrcsOutput } from '../util/generateFrcsOutput'
+import { Values } from '../types'
 
 export function OutputField(props: React.ComponentProps<typeof TextField>) {
   const [value, setValue] = React.useState('')

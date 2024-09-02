@@ -1,10 +1,10 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import { SurveyPageFields } from './SurveyPageFields'
-import { Values, rectToTableBounds, tableBoundsToRect } from './types'
+import { Values, rectToTableBounds } from '../types'
 import { UseFieldConfig, useField } from 'react-final-form'
 import { Fab, MenuItem, TextField } from '@mui/material'
-import { parseNumber } from './parseNumber'
+import { parseNumber } from '../util/parseNumber'
 import { Delete } from '@mui/icons-material'
 import { HomographyBox } from './HomographyBox'
 import { HomographyControlPoints } from './HomographyControlPoints'
@@ -204,19 +204,51 @@ export function SurveySheet({ pageIndex = 0 }: { pageIndex?: number }) {
     bounds = defaultTable?.bounds,
   } = table
 
-  const rectBounds = React.useMemo(() => tableBoundsToRect(bounds), [bounds])
-
   return (
     <Box sx={{ position: 'relative' }}>
       <Box sx={{ userSelect: 'none' }}>
         <img src={pageImage.data} alt="survey sheet" height={800} />
       </Box>
       <HomographyBox
-        width={350}
-        height={500}
+        width={420}
+        height={600}
         bounds={bounds}
         sx={{ border: '1px solid red' }}
       >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -64,
+            left: 0,
+            display: 'flex',
+            gap: 2,
+          }}
+        >
+          <TextField
+            value={layoutVariant}
+            variant="filled"
+            onChange={(e) =>
+              setTable({ ...table, layoutVariant: e.target.value as any })
+            }
+            select
+            label="Layout"
+            sx={{
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            }}
+          >
+            <MenuItem value="IMO">Inner Mountain Outfitters</MenuItem>
+            <MenuItem value="Lech">Lechuguilla</MenuItem>
+            <MenuItem value="FromStaDisAzIncLrUd">
+              From Sta | Dist | Az F/B | Inc F/B | L R | U D
+            </MenuItem>
+            <MenuItem value="ToStaDisAzIncLrUd">
+              To Sta | Dist | Az F/B | Inc F/B | L R | U D
+            </MenuItem>
+          </TextField>
+          <Fab>
+            <Delete />
+          </Fab>
+        </Box>
         <SurveyPageFields
           layoutVariant={layoutVariant}
           useFieldProps={useFieldPropsMap}
@@ -227,38 +259,6 @@ export function SurveySheet({ pageIndex = 0 }: { pageIndex?: number }) {
         bounds={bounds}
         onResize={(bounds) => setTable({ ...table, bounds })}
       />
-      <Box
-        sx={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          position: 'absolute',
-          top: rectBounds.top - 60,
-          left: rectBounds.left,
-          display: 'flex',
-          gap: 2,
-        }}
-      >
-        <TextField
-          value={layoutVariant}
-          variant="filled"
-          onChange={(e) =>
-            setTable({ ...table, layoutVariant: e.target.value as any })
-          }
-          select
-          label="Layout"
-        >
-          <MenuItem value="IMO">Inner Mountain Outfitters</MenuItem>
-          <MenuItem value="Lech">Lechuguilla</MenuItem>
-          <MenuItem value="FromStaDisAzIncLrUd">
-            From Sta | Dist | Az F/B | Inc F/B | L R | U D
-          </MenuItem>
-          <MenuItem value="ToStaDisAzIncLrUd">
-            To Sta | Dist | Az F/B | Inc F/B | L R | U D
-          </MenuItem>
-        </TextField>
-        <Fab>
-          <Delete />
-        </Fab>
-      </Box>
     </Box>
   )
 }

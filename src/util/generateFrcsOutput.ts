@@ -1,4 +1,4 @@
-import { Values } from './types'
+import { Values } from '../types'
 import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
 import { FrcsShot, FrcsShotKind } from '@speleotica/frcsdata/FrcsShot'
 import { FrcsTripHeader, formatFrcsShot } from '@speleotica/frcsdata'

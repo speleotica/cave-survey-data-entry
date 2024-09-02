@@ -9,7 +9,7 @@ import {
 } from 'react-final-form'
 import { OutputField } from './OutputField'
 import { SurveySheetsField } from './SurveySheetsField'
-import { PageImage, Values } from './types'
+import { PageImage, Values } from '../types'
 import throttle from 'lodash/throttle'
 import { Button, FormLabel, MenuItem, Switch, TextField } from '@mui/material'
 import { FormState } from 'final-form'

@@ -1,6 +1,6 @@
 import { Box } from '@mui/material'
 import * as React from 'react'
-import useMouseDrag from './useMouseDrag'
+import useMouseDrag from '../util/useMouseDrag'
 
 export function SplitPane({
   sx,
