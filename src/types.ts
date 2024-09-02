@@ -84,6 +84,7 @@ export const Page = z.object({
 export type Values = z.output<typeof Values>
 export const Values = z
   .object({
+    outputFormat: z.enum(['FRCS', 'Compass', 'Walls']).optional(),
     backsightAzimuthCorrected: z.boolean().default(true).optional(),
     backsightInclinationCorrected: z.boolean().default(true).optional(),
     pages: z.array(Page),

@@ -4,7 +4,7 @@ import { OutputField } from './OutputField'
 // import { SurveySheetsField } from './SurveySheetsField'
 import { Values } from '../types'
 import throttle from 'lodash/throttle'
-import { Button, MenuItem, TextField } from '@mui/material'
+import { Button, MenuItem } from '@mui/material'
 import { SplitPane } from './SplitPane'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createIdb, Idb } from '@/idb/idb'
@@ -12,6 +12,7 @@ import { IdbProvider } from './IdbContext'
 import { form } from '../form'
 import { FormSwitchField } from './FormSwitchField'
 import { SurveySheetsField } from './SurveySheetsField'
+import { FormTextField } from './FormTextField'
 
 const queryClient = new QueryClient()
 
@@ -44,6 +45,7 @@ function Home2() {
       })
     } catch (error) {
       return {
+        outputFormat: 'FRCS',
         backsightAzimuthCorrected: true,
         backsightInclinationCorrected: true,
         pages: [],
@@ -105,9 +107,17 @@ function Home2() {
             alignItems: 'stretch',
           }}
         >
-          <TextField label="Format" select value="frcs" fullWidth>
-            <MenuItem value="frcs">FRCS</MenuItem>
-          </TextField>
+          <FormTextField
+            field={form.get('outputFormat')}
+            type="text"
+            label="Format"
+            select
+            fullWidth
+          >
+            <MenuItem value="FRCS">FRCS</MenuItem>
+            <MenuItem value="Compass">Compass</MenuItem>
+            <MenuItem value="Walls">Walls</MenuItem>
+          </FormTextField>
           <OutputField
             fullWidth
             sx={{ flexGrow: 1, flexShrink: 1, minHeight: 0, mt: 2 }}

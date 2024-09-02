@@ -1,44 +1,64 @@
 import { Values } from '../types'
 import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
-import { FrcsShot, FrcsShotKind } from '@speleotica/frcsdata/FrcsShot'
-import { FrcsTripHeader, formatFrcsShot } from '@speleotica/frcsdata'
+import {
+  CompassTripHeader,
+  formatCompassTripHeader,
+  CompassShot,
+  formatCompassShot,
+  AzimuthUnit,
+  DistanceUnit,
+  InclinationUnit,
+  LrudItem,
+  ShotItem,
+  LrudAssociation,
+} from '@speleotica/compass/dat'
 
-export function generateFrcsOutput({ pages }: Values): string {
+export function generateCompassOutput({ pages }: Values): string {
   if (!pages.length) return ''
-  const header: FrcsTripHeader = {
+  const header: CompassTripHeader = {
+    cave: 'Cave',
     name: 'Trip',
-    distanceUnit: Length.feet,
-    azimuthUnit: Angle.degrees,
-    inclinationUnit: Angle.degrees,
+    date: new Date(),
+    declination: Unitize.degrees(0),
+    distanceUnit: DistanceUnit.DecimalFeet,
+    azimuthUnit: AzimuthUnit.Degrees,
+    inclinationUnit: InclinationUnit.Degrees,
+    hasRedundantBacksights: true,
+    lrudUnit: DistanceUnit.DecimalFeet,
+    shotOrder: [
+      ShotItem.Distance,
+      ShotItem.FrontsightAzimuth,
+      ShotItem.BacksightAzimuth,
+      ShotItem.FrontsightInclination,
+      ShotItem.BacksightInclination,
+    ],
+    lrudOrder: [LrudItem.Left, LrudItem.Up, LrudItem.Down, LrudItem.Right],
+    lrudAssociation: LrudAssociation.ToStation,
   }
-  const frcsShots: FrcsShot[] = []
+  const compassShots: CompassShot[] = []
   for (const { tables } of pages) {
     for (const { shots } of tables) {
       for (let i = 0; i < shots.length - 1; i++) {
         const from = shots[i]?.from?.station
         if (!from) continue
+        const to = shots[i + 1]?.isSplit
+          ? shots[i + 1]?.to?.station
+          : shots[i + 1]?.from?.station
+        if (!to) continue
+
         const excludeDistance = false
         const distance = parseDistance(shots[i]?.distance)
         if (!distance) continue
-        frcsShots.push({
+        compassShots.push({
           from,
-          to: shots[i + 1]?.isSplit
-            ? shots[i + 1]?.to?.station
-            : shots[i + 1]?.from?.station,
-          kind: FrcsShotKind.Normal,
+          to,
           distance,
           excludeDistance,
           frontsightAzimuth: parseAngle(shots[i]?.frontsightAzimuth),
           backsightAzimuth: parseAngle(shots[i]?.backsightAzimuth),
           frontsightInclination: parseAngle(shots[i]?.frontsightInclination),
           backsightInclination: parseAngle(shots[i]?.backsightInclination),
-          fromLruds: {
-            left: parseDistance(shots[i]?.from?.left),
-            right: parseDistance(shots[i]?.from?.right),
-            up: parseDistance(shots[i]?.from?.up),
-            down: parseDistance(shots[i]?.from?.down),
-          },
-          toLruds: shots[i + 1]?.isSplit
+          ...(shots[i + 1]?.isSplit
             ? {
                 left: parseDistance(shots[i + 1]?.to?.left),
                 right: parseDistance(shots[i + 1]?.to?.right),
@@ -50,13 +70,16 @@ export function generateFrcsOutput({ pages }: Values): string {
                 right: parseDistance(shots[i + 1]?.from?.right),
                 up: parseDistance(shots[i + 1]?.from?.up),
                 down: parseDistance(shots[i + 1]?.from?.down),
-              },
+              }),
           comment: shots[i + 1]?.notes,
         })
       }
     }
   }
-  return frcsShots.map((shot) => formatFrcsShot(shot, header)).join('\n')
+  return (
+    formatCompassTripHeader(header) +
+    compassShots.map((shot) => formatCompassShot(header)(shot)).join('')
+  )
 }
 
 function parseDistance(

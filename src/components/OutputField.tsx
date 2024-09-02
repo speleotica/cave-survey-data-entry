@@ -4,6 +4,8 @@ import throttle from 'lodash/throttle'
 import { generateFrcsOutput } from '../util/generateFrcsOutput'
 import { Values } from '../types'
 import { form } from '../form'
+import { generateCompassOutput } from '@/util/generateCompassOutput'
+import { generateWallsOutput } from '@/util/generateWallsOutput'
 
 export function OutputField(props: React.ComponentProps<typeof TextField>) {
   const { value: values } = form.useField([])
@@ -13,7 +15,15 @@ export function OutputField(props: React.ComponentProps<typeof TextField>) {
     () =>
       throttle((values: Values) => {
         setTimeout(() => {
-          setValue(generateFrcsOutput(values))
+          setValue(
+            values.outputFormat === 'FRCS'
+              ? generateFrcsOutput(values)
+              : values.outputFormat === 'Compass'
+              ? generateCompassOutput(values)
+              : values.outputFormat === 'Walls'
+              ? generateWallsOutput(values)
+              : ''
+          )
         }, 0)
       }, 500),
     []
