@@ -11,7 +11,13 @@ import { FormTextField } from './FormTextField'
 import { useQuery } from '@tanstack/react-query'
 import { createIdb } from '@/idb/idb'
 
-export function SurveySheet({ field }: { field: FieldPath<typeof Page> }) {
+export function SurveySheet({
+  field,
+  onDelete,
+}: {
+  field: FieldPath<typeof Page>
+  onDelete?: () => unknown
+}) {
   const tableField = field.get('tables[0]')
 
   const { value: imageId } = useField(field.get('imageId'))
@@ -135,7 +141,7 @@ export function SurveySheet({ field }: { field: FieldPath<typeof Page> }) {
             </MenuItem>
           </FormTextField>
           <Fab>
-            <Delete />
+            <Delete onClick={onDelete} />
           </Fab>
         </Box>
         <SurveyPageFields

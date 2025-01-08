@@ -7,7 +7,7 @@ import { Page, rectToTableBounds } from '../types'
 import * as uuid from 'uuid'
 
 export function SurveySheetsField() {
-  const { elements, pushRaw } = form.useArrayField('pages')
+  const { elements, pushRaw, remove } = form.useArrayField('pages')
 
   const idb = useIdb()
   const handleDragOver = React.useCallback((event: React.DragEvent) => {
@@ -56,7 +56,7 @@ export function SurveySheetsField() {
       onDrop={handleDrop}
     >
       {elements.map((field, index) => (
-        <SurveySheet key={index} field={field} />
+        <SurveySheet key={index} field={field} onDelete={() => remove(index)} />
       ))}
       {!elements.length ? (
         <Box
