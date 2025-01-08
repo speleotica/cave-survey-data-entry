@@ -102,7 +102,7 @@ export const Values = z
 
           if (frontsightAzimuth != null && backsightAzimuth != null) {
             if (!backsightAzimuthCorrected)
-              backsightAzimuth = 360 - backsightAzimuth
+              backsightAzimuth = (backsightAzimuth + 180) % 360
             let diff = Math.abs(frontsightAzimuth - backsightAzimuth)
             if (diff >= 180) diff = 360 - diff
             if (diff > 2) {
