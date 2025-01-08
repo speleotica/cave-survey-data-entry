@@ -17,13 +17,13 @@ export function HomographyBox({
 }) {
   const transform = React.useMemo(() => {
     const h = calculateHomography(
-      [-width / 2, -height / 2],
+      [0, 0],
       [bounds.topLeft.x, bounds.topLeft.y],
-      [width / 2, -height / 2],
+      [width, 0],
       [bounds.topRight.x, bounds.topRight.y],
-      [width / 2, height / 2],
+      [width, height],
       [bounds.bottomRight.x, bounds.bottomRight.y],
-      [-width / 2, height / 2],
+      [0, height],
       [bounds.bottomLeft.x, bounds.bottomLeft.y]
     )
     return `matrix3d(${[
@@ -52,11 +52,12 @@ export function HomographyBox({
       sx={{
         ...sx,
         position: 'absolute',
-        top: -height / 2,
-        left: -width / 2,
+        top: 0,
+        left: 0,
         width,
         height,
         transform,
+        transformOrigin: 'top left',
       }}
     >
       {children}
