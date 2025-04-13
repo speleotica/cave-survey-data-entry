@@ -7,7 +7,7 @@ import { Page, rectToTableBounds } from '../types'
 import * as uuid from 'uuid'
 
 export function SurveySheetsField() {
-  const { elements, pushRaw, remove } = form.useArrayField('pages')
+  const { elements, push, remove } = form.useArrayField('pages')
 
   const idb = useIdb()
   const handleDragOver = React.useCallback((event: React.DragEvent) => {
@@ -21,7 +21,7 @@ export function SurveySheetsField() {
       for (const file of files) {
         const imageId = uuid.v1()
         await idb.add('pageImages', file, imageId)
-        pushRaw({
+        push({
           imageId,
           tables: [
             {
@@ -37,7 +37,7 @@ export function SurveySheetsField() {
         } as Page)
       }
     },
-    [pushRaw]
+    [push]
   )
 
   return (

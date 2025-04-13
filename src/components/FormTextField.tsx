@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FieldPathForRawValue, useHtmlField } from '@jcoreio/zod-forms'
+import { FieldPathForValue, useHtmlField } from '@jcoreio/zod-forms'
 import { TextField } from '@mui/material'
 import { HTMLInputTypeAttribute } from 'react'
 
@@ -9,7 +9,7 @@ export function FormTextField({
   ...props
 }: Omit<React.ComponentProps<typeof TextField>, 'type'> & {
   type: HTMLInputTypeAttribute
-  field: FieldPathForRawValue<
+  field: FieldPathForValue<
     string | number | bigint | boolean | null | undefined
   >
 }) {

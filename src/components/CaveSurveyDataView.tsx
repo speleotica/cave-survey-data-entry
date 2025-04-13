@@ -53,7 +53,7 @@ function Home2() {
     }
   }, [])
 
-  useInitialize({ rawValues: initialValues })
+  useInitialize({ values: initialValues }, [])
 
   return (
     <>
@@ -136,7 +136,7 @@ function ClearDataButton() {
         setValue(
           (value || []).map((page) => ({
             ...page,
-            tables: page.tables?.map((table) => ({
+            tables: page?.tables?.map((table) => ({
               ...table,
               shots: [],
             })),
@@ -163,7 +163,7 @@ function ClearAllButton() {
 }
 
 function PersistData() {
-  const { rawValue } = form.useField([])
+  const { value } = form.useField([])
 
   const handleChange = React.useMemo(
     () =>
@@ -174,8 +174,8 @@ function PersistData() {
   )
 
   React.useEffect(() => {
-    if (rawValue) handleChange(rawValue)
-  }, [rawValue])
+    if (value) handleChange(value)
+  }, [value])
 
   return null
 }

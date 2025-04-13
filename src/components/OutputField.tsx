@@ -30,7 +30,8 @@ export function OutputField(props: React.ComponentProps<typeof TextField>) {
   )
 
   React.useEffect(() => {
-    if (values) handleChange(values)
+    const parsedValues = Values.safeParse(values)
+    if (parsedValues.success) handleChange(parsedValues.data)
   }, [values])
 
   return (

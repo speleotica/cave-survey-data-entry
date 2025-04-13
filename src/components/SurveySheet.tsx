@@ -39,7 +39,7 @@ export function SurveySheet({
     },
   })
 
-  const { value: bounds, setValue: setBounds } = useField(
+  const { parsedValue: bounds, setValue: setBounds } = useField(
     tableField.get('bounds')
   )
 

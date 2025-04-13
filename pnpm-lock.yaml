@@ -21,8 +21,8 @@ dependencies:
     specifier: latest
     version: 11.13.0(@emotion/react@11.13.3)(@types/react@18.3.4)(react@18.3.1)
   '@jcoreio/zod-forms':
-    specifier: ^1.1.2
-    version: 1.1.2(@types/react@18.3.4)(react@18.3.1)
+    specifier: ^2.0.0-beta.3
+    version: 2.0.0-beta.3(@types/react@18.3.4)(react@18.3.1)
   '@mui/icons-material':
     specifier: ^5.15.18
     version: 5.15.18(@mui/material@5.16.7)(@types/react@18.3.4)(react@18.3.1)
@@ -1794,8 +1794,8 @@ packages:
       - supports-color
     dev: true
 
-  /@jcoreio/zod-forms@1.1.2(@types/react@18.3.4)(react@18.3.1):
-    resolution: {integrity: sha512-u0LMCwApxRbCxik8ZvCe23VL9gwk5axx4CVS9l+ySRJeii0SmcpjSfZmQrB1Vhd6JqZTaJHq/CAM0YblIqTc3A==}
+  /@jcoreio/zod-forms@2.0.0-beta.3(@types/react@18.3.4)(react@18.3.1):
+    resolution: {integrity: sha512-42I+xIMIBUj5C0vVAfHR+ZIDyE9Q8IyfToGMmqKPX3iEwnz1OxNC28eBSOat1gSoBCRKodbwlwp8d105q+cbBg==}
     engines: {node: '>=16'}
     peerDependencies:
       react: ^18.0.0
@@ -1808,7 +1808,7 @@ packages:
       reselect: 5.1.1
       shallow-equal: 3.1.0
       zod: 3.23.8
-      zod-invertible: 1.0.1
+      zod-invertible: 1.2.0
     transitivePeerDependencies:
       - '@types/react'
     dev: false
@@ -5799,8 +5799,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zod-invertible@1.0.1:
-    resolution: {integrity: sha512-zUbsVi0yrYz1guuvAVxQ8aQwujxcPQs1k7enJXr9kWUhpj4L14HrIyF/89h34ZbkzyyAPw4pxE+KHANO2izLCg==}
+  /zod-invertible@1.2.0:
+    resolution: {integrity: sha512-2WFYnJntrzkwUD31JjrLmz9ErK2AAeXOfjsIjsuWZilmDs3rdOHFD+07gSZKAI9ijvqN/HAx9xE7JMFeiFDetQ==}
     engines: {node: '>=16'}
     dependencies:
       '@babel/runtime': 7.25.4
