@@ -9,31 +9,37 @@ import {
 import * as React from 'react'
 import { LayoutVariant } from '../types'
 import { ViewStream, Error } from '@mui/icons-material'
+import {
+  UseFieldProps as _UseFieldProps,
+  FieldPathForValue,
+} from '@jcoreio/zod-forms'
 
-type UseFieldProps = (index: number) => React.ComponentProps<
+type UseHtmlFieldProps = (index: number) => React.ComponentProps<
   typeof TextField
 > & {
   validationError?: React.ReactNode
 }
 
+type UseFieldProps<V> = (index: number) => _UseFieldProps<FieldPathForValue<V>>
+
 type UseStationAndLrudFieldProps = {
-  station?: UseFieldProps
-  left?: UseFieldProps
-  right?: UseFieldProps
-  up?: UseFieldProps
-  down?: UseFieldProps
+  station?: UseHtmlFieldProps
+  left?: UseHtmlFieldProps
+  right?: UseHtmlFieldProps
+  up?: UseHtmlFieldProps
+  down?: UseHtmlFieldProps
 }
 
 type UseFieldPropsMap = {
   from?: UseStationAndLrudFieldProps
   to?: UseStationAndLrudFieldProps
-  isSplit?: UseFieldProps
-  distance?: UseFieldProps
-  frontsightAzimuth?: UseFieldProps
-  backsightAzimuth?: UseFieldProps
-  frontsightInclination?: UseFieldProps
-  backsightInclination?: UseFieldProps
-  notes?: UseFieldProps
+  isSplit?: UseFieldProps<boolean | undefined>
+  distance?: UseHtmlFieldProps
+  frontsightAzimuth?: UseHtmlFieldProps
+  backsightAzimuth?: UseHtmlFieldProps
+  frontsightInclination?: UseHtmlFieldProps
+  backsightInclination?: UseHtmlFieldProps
+  notes?: UseHtmlFieldProps
 }
 
 export const SurveyPageFields = React.memo(function SurveyPageFields({
@@ -57,6 +63,7 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
         width: '100%',
         height: '100%',
       }}
+      data-component="SurveyPageFields"
     >
       {[...Array(numRows).keys()].map((index) => (
         <SurveyRow
@@ -134,7 +141,7 @@ const SurveyRow = ({
                 width: 32,
                 minHeight: 32,
               }}
-              onClick={() => isSplitProps?.onChange?.(false as any)}
+              onClick={() => isSplitProps?.setValue(false)}
             >
               <ViewStream />
             </Fab>
@@ -186,7 +193,7 @@ const SurveyRow = ({
                   width: 32,
                   minHeight: 32,
                 }}
-                onClick={() => isSplitProps?.onChange?.(true as any)}
+                onClick={() => isSplitProps?.setValue(true)}
               >
                 <ViewStream />
               </Fab>
@@ -452,7 +459,7 @@ const SurveyTextField = ({
   left?: FieldReference
   right?: FieldReference
   index: number
-  useFieldProps?: UseFieldProps
+  useFieldProps?: UseHtmlFieldProps
 }) => {
   const { validationError, ...fieldProps } = useFieldProps?.(index) || {}
 
@@ -481,13 +488,12 @@ const SurveyTextField = ({
           }
           break
       }
+      const page = input?.closest(`[data-component="SurveyPageFields"]`)
       const otherInput =
         typeof ref === 'string'
-          ? document.querySelector(
-              `[data-field="${ref}"][data-index="${index}"]`
-            )
+          ? page?.querySelector(`[data-field="${ref}"][data-index="${index}"]`)
           : ref
-          ? document.querySelector(
+          ? page?.querySelector(
               `[data-field="${ref.field}"][data-index="${ref.index}"]`
             )
           : undefined

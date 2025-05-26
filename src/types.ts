@@ -72,13 +72,13 @@ export type Table = z.output<typeof Table>
 export const Table = z.object({
   layoutVariant: LayoutVariant.optional(),
   bounds: TableBounds.optional(),
-  shots: z.array(Shot),
+  shots: z.array(Shot.optional()).default([]),
 })
 
 export type Page = z.output<typeof Page>
 export const Page = z.object({
   imageId: z.string().uuid(),
-  tables: z.array(Table),
+  tables: z.array(Table).default([]),
 })
 
 export type Values = z.output<typeof Values>
@@ -87,7 +87,7 @@ export const Values = z
     outputFormat: z.enum(['FRCS', 'Compass', 'Walls']).optional(),
     backsightAzimuthCorrected: z.boolean().default(true).optional(),
     backsightInclinationCorrected: z.boolean().default(true).optional(),
-    pages: z.array(Page),
+    pages: z.array(Page).default([]),
   })
   .superRefine((values, ctx) => {
     const { backsightAzimuthCorrected, backsightInclinationCorrected, pages } =
@@ -97,8 +97,10 @@ export const Values = z
       for (let t = 0; t < tables.length; t++) {
         const { shots } = tables[t]
         for (let s = 0; s < shots.length; s++) {
-          const { frontsightAzimuth, frontsightInclination } = shots[s]
-          let { backsightAzimuth, backsightInclination } = shots[s]
+          const shot = shots[s]
+          if (!shot) continue
+          const { frontsightAzimuth, frontsightInclination } = shot
+          let { backsightAzimuth, backsightInclination } = shot
 
           if (frontsightAzimuth != null && backsightAzimuth != null) {
             if (!backsightAzimuthCorrected)

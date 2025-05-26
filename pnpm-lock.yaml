@@ -21,8 +21,8 @@ dependencies:
     specifier: latest
     version: 11.13.0(@emotion/react@11.13.3)(@types/react@18.3.4)(react@18.3.1)
   '@jcoreio/zod-forms':
-    specifier: ^2.0.0-beta.3
-    version: 2.0.0-beta.3(@types/react@18.3.4)(react@18.3.1)
+    specifier: ^2.0.0-beta.4
+    version: 2.0.0-beta.4(@types/react@18.3.4)(react@18.3.1)
   '@mui/icons-material':
     specifier: ^5.15.18
     version: 5.15.18(@mui/material@5.16.7)(@types/react@18.3.4)(react@18.3.1)
@@ -1794,8 +1794,8 @@ packages:
       - supports-color
     dev: true
 
-  /@jcoreio/zod-forms@2.0.0-beta.3(@types/react@18.3.4)(react@18.3.1):
-    resolution: {integrity: sha512-42I+xIMIBUj5C0vVAfHR+ZIDyE9Q8IyfToGMmqKPX3iEwnz1OxNC28eBSOat1gSoBCRKodbwlwp8d105q+cbBg==}
+  /@jcoreio/zod-forms@2.0.0-beta.4(@types/react@18.3.4)(react@18.3.1):
+    resolution: {integrity: sha512-l39TKQrsIWpSeZOdQj/Cvr0Xzu5WJayw6eVMKXlsr/Vs69OXJaZnoXmbgk541I2xRAZzEPq39HvGiJ9rOQXCAQ==}
     engines: {node: '>=16'}
     peerDependencies:
       react: ^18.0.0

@@ -10,6 +10,7 @@ import { FieldPath, useField, useHtmlField } from '@jcoreio/zod-forms'
 import { FormTextField } from './FormTextField'
 import { useQuery } from '@tanstack/react-query'
 import { createIdb } from '@/idb/idb'
+import z from 'zod'
 
 export function SurveySheet({
   field,
@@ -48,10 +49,10 @@ export function SurveySheet({
   )
 
   const useFieldPropsMap = React.useMemo(() => {
-    const useFieldProps =
+    const useHtmlFieldProps =
       (
         subfield: (
-          field: FieldPath<typeof Shot>
+          field: FieldPath<z.ZodOptional<typeof Shot>>
         ) => React.ComponentProps<typeof FormTextField>['field']
       ) =>
       (index: number) => {
@@ -68,34 +69,44 @@ export function SurveySheet({
         }
       }
 
+    const useFieldProps =
+      <V extends FieldPath>(
+        subfield: (field: FieldPath<z.ZodOptional<typeof Shot>>) => V
+      ) =>
+      (index: number) => {
+        return useField(subfield(tableField.get(['shots', index])))
+      }
+
     return {
       from: {
-        station: useFieldProps((field) => field.get('from.station')),
-        left: useFieldProps((field) => field.get('from.left')),
-        right: useFieldProps((field) => field.get('from.right')),
-        up: useFieldProps((field) => field.get('from.up')),
-        down: useFieldProps((field) => field.get('from.down')),
+        station: useHtmlFieldProps((field) => field.get('from.station')),
+        left: useHtmlFieldProps((field) => field.get('from.left')),
+        right: useHtmlFieldProps((field) => field.get('from.right')),
+        up: useHtmlFieldProps((field) => field.get('from.up')),
+        down: useHtmlFieldProps((field) => field.get('from.down')),
       },
       to: {
-        station: useFieldProps((field) => field.get('to.station')),
-        left: useFieldProps((field) => field.get('to.left')),
-        right: useFieldProps((field) => field.get('to.right')),
-        up: useFieldProps((field) => field.get('to.up')),
-        down: useFieldProps((field) => field.get('to.down')),
+        station: useHtmlFieldProps((field) => field.get('to.station')),
+        left: useHtmlFieldProps((field) => field.get('to.left')),
+        right: useHtmlFieldProps((field) => field.get('to.right')),
+        up: useHtmlFieldProps((field) => field.get('to.up')),
+        down: useHtmlFieldProps((field) => field.get('to.down')),
       },
       isSplit: useFieldProps((field) => field.get('isSplit')),
-      distance: useFieldProps((field) => field.get('distance')),
-      frontsightAzimuth: useFieldProps((field) =>
+      distance: useHtmlFieldProps((field) => field.get('distance')),
+      frontsightAzimuth: useHtmlFieldProps((field) =>
         field.get('frontsightAzimuth')
       ),
-      backsightAzimuth: useFieldProps((field) => field.get('backsightAzimuth')),
-      frontsightInclination: useFieldProps((field) =>
+      backsightAzimuth: useHtmlFieldProps((field) =>
+        field.get('backsightAzimuth')
+      ),
+      frontsightInclination: useHtmlFieldProps((field) =>
         field.get('frontsightInclination')
       ),
-      backsightInclination: useFieldProps((field) =>
+      backsightInclination: useHtmlFieldProps((field) =>
         field.get('backsightInclination')
       ),
-      notes: useFieldProps((field) => field.get('notes')),
+      notes: useHtmlFieldProps((field) => field.get('notes')),
     }
   }, [tableField])
 
@@ -140,8 +151,8 @@ export function SurveySheet({
               To Sta | Dist | Az F/B | Inc F/B | L R | U D
             </MenuItem>
           </FormTextField>
-          <Fab>
-            <Delete onClick={onDelete} />
+          <Fab onClick={onDelete}>
+            <Delete />
           </Fab>
         </Box>
         <SurveyPageFields
