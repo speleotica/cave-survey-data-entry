@@ -101,8 +101,26 @@ const SurveyRow = ({
     layoutVariant === 'FromStaDisAzIncLrUd' ||
     layoutVariant === 'ToStaDisAzIncLrUd'
   const isSplit = isSimpleGrid ? false : isSplitProps?.value === true
-  const nextSplit = useFieldProps?.isSplit?.(index + 1)?.value === true
   const stationIndex = layoutVariant === 'ToStaDisAzIncLrUd' ? index + 1 : index
+
+  let x = 0
+  const y = isSimpleGrid ? index : index * 2
+  const fsY = isSimpleGrid ? y : y + 1
+  const bsY = isSimpleGrid ? y : y + 2
+  const xs = {
+    fromStation: x,
+    toStation: x,
+    distance: ++x,
+    frontsightAzimuth: ++x,
+    backsightAzimuth: isSimpleGrid ? ++x : x,
+    frontsightInclination: ++x,
+    backsightInclination: isSimpleGrid ? ++x : x,
+    left: ++x,
+    right: ++x,
+    up: ++x,
+    down: ++x,
+    notes: ++x,
+  }
 
   const stationSx = {
     position: 'relative',
@@ -147,26 +165,16 @@ const SurveyRow = ({
             </Fab>
           </Tooltip>
           <SurveyTextField
+            x={xs.toStation}
+            y={y}
             index={index}
             useFieldProps={useFieldProps?.to?.station}
-            field="to.station"
-            above={{
-              field: 'from.station',
-              index: index - 1,
-            }}
-            below={{ field: 'from.station', index }}
-            right="distance"
           />
           <SurveyTextField
+            x={xs.fromStation}
+            y={y + 1}
             index={index}
             useFieldProps={useFieldProps?.from?.station}
-            field="from.station"
-            below={{
-              field: nextSplit ? 'to.station' : 'from.station',
-              index: index + 1,
-            }}
-            above={{ field: 'to.station', index }}
-            right="distance"
           />
         </Split>
       ) : (
@@ -200,18 +208,11 @@ const SurveyRow = ({
             </Tooltip>
           )}
           <SurveyTextField
+            x={xs.fromStation}
+            y={y}
+            h={isSimpleGrid ? 1 : 2}
             index={stationIndex}
             useFieldProps={useFieldProps?.from?.station}
-            field="from.station"
-            above={{
-              field: 'from.station',
-              index: stationIndex - 1,
-            }}
-            below={{
-              field: nextSplit ? 'to.station' : 'from.station',
-              index: stationIndex + 1,
-            }}
-            right="distance"
           />
         </Box>
       )}
@@ -238,11 +239,11 @@ const SurveyRow = ({
             }}
           >
             <SurveyTextField
+              x={xs.distance}
+              y={fsY}
+              h={isSimpleGrid ? 1 : 2}
               index={index}
               useFieldProps={useFieldProps?.distance}
-              field="distance"
-              left="from.station"
-              right="frontsightAzimuth"
               sx={{
                 flexBasis: 0,
                 flexGrow: 1,
@@ -258,22 +259,16 @@ const SurveyRow = ({
               }}
             >
               <AngleField
+                x={xs.frontsightAzimuth}
+                y={fsY}
                 index={index}
-                field="frontsightAzimuth"
                 useFieldProps={useFieldProps?.frontsightAzimuth}
-                above={{ field: 'backsightAzimuth', index: index - 1 }}
-                below={{ field: 'backsightAzimuth', index }}
-                left="distance"
-                right="frontsightInclination"
               />
               <AngleField
+                x={xs.backsightAzimuth}
+                y={bsY}
                 index={index}
-                field="backsightAzimuth"
                 useFieldProps={useFieldProps?.backsightAzimuth}
-                above={{ field: 'frontsightAzimuth', index }}
-                below={{ field: 'frontsightAzimuth', index: index + 1 }}
-                left="distance"
-                right="backsightInclination"
               />
             </Split>
             <Split
@@ -285,25 +280,16 @@ const SurveyRow = ({
               }}
             >
               <AngleField
+                x={xs.frontsightInclination}
+                y={fsY}
                 index={index}
-                field="frontsightInclination"
                 useFieldProps={useFieldProps?.frontsightInclination}
-                above={{ field: 'backsightInclination', index: index - 1 }}
-                below={{ field: 'backsightInclination', index }}
-                left="frontsightAzimuth"
-                right="from.left"
               />
               <AngleField
+                x={xs.backsightInclination}
+                y={bsY}
                 index={index}
-                field="backsightInclination"
                 useFieldProps={useFieldProps?.backsightInclination}
-                above={{ field: 'frontsightInclination', index }}
-                below={{ field: 'frontsightInclination', index: index + 1 }}
-                left="backsightAzimuth"
-                right={{
-                  field: nextSplit ? 'to.left' : 'from.left',
-                  index: index + 1,
-                }}
               />
             </Split>
           </Box>
@@ -324,75 +310,41 @@ const SurveyRow = ({
           isSplit ? (
             <Split key={dir}>
               <SurveyTextField
+                x={xs[lrudDirs[lrudIndex]]}
+                y={y}
                 index={index}
-                field={`to.${dir}`}
                 useFieldProps={useFieldProps?.to?.[dir]}
-                above={{ field: `from.${dir}`, index: stationIndex - 1 }}
-                below={{ field: `from.${dir}`, index: stationIndex }}
-                left={
-                  lrudIndex > 0
-                    ? `to.${lrudDirs[lrudIndex - 1]}`
-                    : { field: 'backsightInclination', index: stationIndex - 1 }
-                }
-                right={
-                  lrudIndex < 3 ? `to.${lrudDirs[lrudIndex + 1]}` : 'notes'
-                }
               />
               <SurveyTextField
+                x={xs[lrudDirs[lrudIndex]]}
+                y={y + 1}
                 index={index}
-                field={`from.${dir}`}
                 useFieldProps={useFieldProps?.from?.[dir]}
-                above={{ field: `to.${dir}`, index: stationIndex }}
-                below={{
-                  field: nextSplit ? `to.${dir}` : `from.${dir}`,
-                  index: stationIndex + 1,
-                }}
-                left={
-                  lrudIndex > 0
-                    ? `from.${lrudDirs[lrudIndex - 1]}`
-                    : 'frontsightInclination'
-                }
-                right={
-                  lrudIndex < 3 ? `from.${lrudDirs[lrudIndex + 1]}` : 'notes'
-                }
               />
             </Split>
           ) : (
             <SurveyTextField
+              x={xs[lrudDirs[lrudIndex]]}
+              y={y}
+              h={isSimpleGrid ? 1 : 2}
               key={dir}
               index={stationIndex}
-              field={`from.${dir}`}
               useFieldProps={useFieldProps?.from?.[dir]}
-              above={{
-                field: `from.${dir}`,
-                index: stationIndex - 1,
-              }}
-              below={{
-                field: nextSplit ? `to.${dir}` : `from.${dir}`,
-                index: stationIndex + 1,
-              }}
-              left={
-                lrudIndex > 0
-                  ? `from.${lrudDirs[lrudIndex - 1]}`
-                  : 'frontsightInclination'
-              }
-              right={
-                lrudIndex < 3 ? `from.${lrudDirs[lrudIndex + 1]}` : 'notes'
-              }
             />
           )
         )}
         {isSimpleGrid ? undefined : (
           <SurveyTextField
+            x={xs.notes}
+            y={y}
+            h={isSimpleGrid ? 1 : 2}
             index={index}
-            field="notes"
             useFieldProps={useFieldProps?.notes}
             sx={{
               flexGrow: 0,
               flexShrink: 0,
               flexBasis: layoutVariant === 'Lech' ? '43%' : '30%',
             }}
-            left="from.down"
           />
         )}
       </Box>
@@ -415,95 +367,92 @@ function Split({ sx, children }: { sx?: SxProps; children?: React.ReactNode }) {
   )
 }
 
-type FieldType =
-  | 'from.station'
-  | 'from.left'
-  | 'from.right'
-  | 'from.up'
-  | 'from.down'
-  | 'distance'
-  | 'frontsightAzimuth'
-  | 'backsightAzimuth'
-  | 'frontsightInclination'
-  | 'backsightInclination'
-  | 'to.station'
-  | 'to.left'
-  | 'to.right'
-  | 'to.up'
-  | 'to.down'
-  | 'notes'
-
-type FieldReference =
-  | FieldType
-  | {
-      field: FieldType
-      index: number
-    }
-
 const SurveyTextField = ({
-  field,
   index,
-  above = { field, index: index - 1 },
-  below = { field, index: index + 1 },
-  left,
-  right,
+  x,
+  y,
+  h = 1,
   useFieldProps,
   sx,
   inputProps,
   InputProps,
   ...props
 }: React.ComponentProps<typeof TextField> & {
-  field: FieldType
-  above?: FieldReference
-  below?: FieldReference
-  left?: FieldReference
-  right?: FieldReference
   index: number
+  x: number
+  y: number
+  h?: number
   useFieldProps?: UseHtmlFieldProps
 }) => {
   const { validationError, ...fieldProps } = useFieldProps?.(index) || {}
 
   const onKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
-      let ref: FieldReference | undefined
+      type Ref = [x: number, y: number, h?: number]
+      let refs: Ref[] | undefined
       const input =
         event.target instanceof HTMLInputElement ? event.target : undefined
       switch (event.key) {
         case 'ArrowUp':
           event.preventDefault()
-          ref = above
+          refs = [
+            [x, y - 1, 1],
+            [x, y - 2, 2],
+          ]
           break
         case 'ArrowDown':
           event.preventDefault()
-          ref = below
+          refs = [[x, y + h]]
           break
         case 'ArrowLeft':
-          if (input?.selectionStart === 0) {
-            ref = left
-          }
+          refs =
+            h === 2
+              ? [
+                  [x - 1, y + 1, 1],
+                  [x - 1, y - 1, 2],
+                  [x - 1, y],
+                  [x - 1, y - 1],
+                ]
+              : [
+                  [x - 1, y],
+                  [x - 1, y - 1, 2],
+                  [x - 1, y - 1],
+                ]
           break
         case 'ArrowRight':
           if (input && input.selectionEnd === input.value?.length) {
-            ref = right
+            refs =
+              h === 2
+                ? [
+                    [x + 1, y],
+                    [x + 1, y + 1],
+                    [x + 1, y - 1, 2],
+                  ]
+                : [
+                    [x + 1, y],
+                    [x + 1, y - 1, 2],
+                  ]
           }
           break
       }
       const page = input?.closest(`[data-component="SurveyPageFields"]`)
-      const otherInput =
-        typeof ref === 'string'
-          ? page?.querySelector(`[data-field="${ref}"][data-index="${index}"]`)
-          : ref
-          ? page?.querySelector(
-              `[data-field="${ref.field}"][data-index="${ref.index}"]`
-            )
-          : undefined
-      if (otherInput instanceof HTMLInputElement) {
+      let otherInput: HTMLInputElement | undefined
+      for (const [x, y, h] of refs || []) {
+        const input = page?.querySelector(
+          `[data-x="${x}"][data-y="${y}"]${h != null ? `[data-h="${h}"]` : ''}`
+        )
+        if (input instanceof HTMLInputElement) {
+          otherInput = input
+          break
+        }
+      }
+      if (otherInput) {
         event.preventDefault()
         otherInput.focus()
         otherInput.select()
       }
     },
-    [field, index]
+    [x, y, h]
   )
 
   return (
@@ -526,8 +475,9 @@ const SurveyTextField = ({
         ...sx,
       }}
       inputProps={{
-        'data-field': field,
-        'data-index': index,
+        'data-x': x,
+        'data-y': y,
+        'data-h': h,
         ...inputProps,
       }}
       InputProps={{
