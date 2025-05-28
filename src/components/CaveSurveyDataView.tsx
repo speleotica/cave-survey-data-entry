@@ -58,6 +58,7 @@ function Home2() {
   return (
     <>
       <PersistData />
+      <HideOverlayHotkey />
       <SplitPane
         sx={{
           position: 'fixed',
@@ -87,6 +88,10 @@ function Home2() {
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
             <ClearDataButton />
             <ClearAllButton />
+            <FormSwitchField
+              field={form.get('hideOverlay')}
+              label="Hide Overlay (Alt/⌥)"
+            />
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4, mb: 2 }}>
             <FormSwitchField
@@ -176,6 +181,28 @@ function PersistData() {
   React.useEffect(() => {
     if (value) handleChange(value)
   }, [value])
+
+  return null
+}
+
+function HideOverlayHotkey() {
+  const { setValue } = form.useField('hideOverlay')
+
+  React.useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Alt') setValue(true)
+    }
+    function onKeyUp(e: KeyboardEvent) {
+      if (e.key === 'Alt') setValue(false)
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keyup', onKeyUp)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('keyup', onKeyUp)
+    }
+  }, [])
 
   return null
 }

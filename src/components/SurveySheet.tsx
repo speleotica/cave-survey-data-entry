@@ -11,6 +11,7 @@ import { FormTextField } from './FormTextField'
 import { useQuery } from '@tanstack/react-query'
 import { createIdb } from '@/idb/idb'
 import z from 'zod'
+import { form } from '@/form'
 
 export function SurveySheet({
   field,
@@ -117,50 +118,58 @@ export function SurveySheet({
       <Box sx={{ userSelect: 'none' }}>
         <img src={imgQuery.data ?? undefined} alt="survey sheet" height={800} />
       </Box>
-      <HomographyBox
-        width={420}
-        height={600}
-        bounds={bounds}
-        sx={{ border: '1px solid red' }}
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: -64,
-            left: 0,
-            display: 'flex',
-            gap: 2,
-          }}
+      <HideOverlay>
+        <HomographyBox
+          width={420}
+          height={600}
+          bounds={bounds}
+          sx={{ border: '1px solid red' }}
         >
-          <FormTextField
-            variant="filled"
-            type="text"
-            field={tableField.get('layoutVariant')}
-            select
-            label="Layout"
+          <Box
             sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              position: 'absolute',
+              top: -64,
+              left: 0,
+              display: 'flex',
+              gap: 2,
             }}
           >
-            <MenuItem value="IMO">Inner Mountain Outfitters</MenuItem>
-            <MenuItem value="Lech">Lechuguilla</MenuItem>
-            <MenuItem value="FromStaDisAzIncLrUd">
-              From Sta | Dist | Az F/B | Inc F/B | L R | U D
-            </MenuItem>
-            <MenuItem value="ToStaDisAzIncLrUd">
-              To Sta | Dist | Az F/B | Inc F/B | L R | U D
-            </MenuItem>
-          </FormTextField>
-          <Fab onClick={onDelete}>
-            <Delete />
-          </Fab>
-        </Box>
-        <SurveyPageFields
-          layoutVariant={layoutVariant}
-          useFieldProps={useFieldPropsMap}
-        />
-      </HomographyBox>
-      <HomographyControlPoints bounds={bounds} onResize={setBounds} />
+            <FormTextField
+              variant="filled"
+              type="text"
+              field={tableField.get('layoutVariant')}
+              select
+              label="Layout"
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              }}
+            >
+              <MenuItem value="IMO">Inner Mountain Outfitters</MenuItem>
+              <MenuItem value="Lech">Lechuguilla</MenuItem>
+              <MenuItem value="FromStaDisAzIncLrUd">
+                From Sta | Dist | Az F/B | Inc F/B | L R | U D
+              </MenuItem>
+              <MenuItem value="ToStaDisAzIncLrUd">
+                To Sta | Dist | Az F/B | Inc F/B | L R | U D
+              </MenuItem>
+            </FormTextField>
+            <Fab onClick={onDelete}>
+              <Delete />
+            </Fab>
+          </Box>
+          <SurveyPageFields
+            layoutVariant={layoutVariant}
+            useFieldProps={useFieldPropsMap}
+          />
+        </HomographyBox>
+        <HomographyControlPoints bounds={bounds} onResize={setBounds} />
+      </HideOverlay>
     </Box>
   )
+}
+
+function HideOverlay({ children }: { children: React.ReactNode }) {
+  const { value: hideOverlay } = form.useField('hideOverlay')
+
+  return <div style={{ opacity: hideOverlay ? 0 : 1 }}>{children}</div>
 }
