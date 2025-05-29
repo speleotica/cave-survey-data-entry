@@ -15,6 +15,12 @@ const theme = createTheme({
         }),
       },
     },
+    MuiInputBase: {
+      defaultProps: {
+        // work around developer-unfriendly MUI performance issue
+        disableInjectingGlobalStyles: true,
+      },
+    },
   },
 })
 

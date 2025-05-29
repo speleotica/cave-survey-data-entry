@@ -482,7 +482,6 @@ const SurveyTextField = ({
       }}
       InputProps={{
         ...InputProps,
-        disableInjectingGlobalStyles: true,
         sx: {
           borderRadius: 0,
           height: '100%',

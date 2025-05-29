@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import { OutputField } from './OutputField'
-// import { SurveySheetsField } from './SurveySheetsField'
 import { Values } from '../types'
 import throttle from 'lodash/throttle'
 import { Button, MenuItem } from '@mui/material'
