@@ -15,15 +15,23 @@ export function OutputField(props: React.ComponentProps<typeof TextField>) {
     () =>
       throttle((values: Values) => {
         setTimeout(() => {
-          setValue(
-            values.outputFormat === 'FRCS'
-              ? generateFrcsOutput(values)
-              : values.outputFormat === 'Compass'
-              ? generateCompassOutput(values)
-              : values.outputFormat === 'Walls'
-              ? generateWallsOutput(values)
-              : ''
-          )
+          try {
+            setValue(
+              values.outputFormat === 'FRCS'
+                ? generateFrcsOutput(values)
+                : values.outputFormat === 'Compass'
+                ? generateCompassOutput(values)
+                : values.outputFormat === 'Walls'
+                ? generateWallsOutput(values)
+                : ''
+            )
+          } catch (error) {
+            setValue(
+              error instanceof Error
+                ? error.stack || error.message
+                : String(error)
+            )
+          }
         }, 0)
       }, 500),
     []
