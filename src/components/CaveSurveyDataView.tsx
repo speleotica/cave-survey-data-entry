@@ -100,7 +100,13 @@ function Home2() {
             overflow: 'hidden',
           }}
         >
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 1,
+            }}
+          >
             <ClearDataButton />
             <ClearAllButton />
             <FormSwitchField
@@ -121,7 +127,7 @@ function Home2() {
               </IconButton>
             </Tooltip>
           </Box>
-          <Collapse in={!hideHeader}>
+          <Collapse in={!hideHeader} sx={{ flexShrink: 0 }}>
             <Box
               sx={{
                 p: 1,
