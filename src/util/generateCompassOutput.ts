@@ -1,4 +1,4 @@
-import { Values } from '../types'
+import { distanceValue, isDistanceExcluded, Values } from '../types'
 import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
 import {
   CompassTripHeader,
@@ -56,8 +56,7 @@ export function generateCompassOutput({ tripHeader, pages }: Values): string {
           : shots[i + 1]?.from?.station
         if (!to) continue
 
-        const excludeDistance = false
-        const distance = parseDistance(shots[i]?.distance)
+        const distance = parseDistance(distanceValue(shots[i]?.distance))
         if (!distance) continue
         let backsightAzimuth = parseAngle(shots[i]?.backsightAzimuth)
         if (backsightAzimuth && tripHeader.backsightAzimuthCorrected)
@@ -69,7 +68,7 @@ export function generateCompassOutput({ tripHeader, pages }: Values): string {
           from,
           to,
           distance,
-          excludeDistance,
+          excludeDistance: isDistanceExcluded(shots[i]?.distance),
           frontsightAzimuth: parseAngle(shots[i]?.frontsightAzimuth),
           backsightAzimuth,
           frontsightInclination: parseAngle(shots[i]?.frontsightInclination),

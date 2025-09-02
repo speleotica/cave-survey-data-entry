@@ -1,4 +1,4 @@
-import { Values } from '../types'
+import { distanceValue, isDistanceExcluded, Values } from '../types'
 import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
 import { FrcsShot, FrcsShotKind } from '@speleotica/frcsdata/FrcsShot'
 import { FrcsTripHeader, formatFrcsSurveyFile } from '@speleotica/frcsdata'
@@ -36,8 +36,7 @@ export async function generateFrcsOutput({
       for (let i = 0; i < shots.length - 1; i++) {
         const from = shots[i]?.from?.station
         if (!from) continue
-        const excludeDistance = false
-        const distance = parseDistance(shots[i]?.distance)
+        const distance = parseDistance(distanceValue(shots[i]?.distance))
         if (!distance) continue
         frcsShots.push({
           from,
@@ -46,7 +45,7 @@ export async function generateFrcsOutput({
             : shots[i + 1]?.from?.station,
           kind: FrcsShotKind.Normal,
           distance,
-          excludeDistance,
+          excludeDistance: isDistanceExcluded(shots[i]?.distance),
           frontsightAzimuth: parseAngle(shots[i]?.frontsightAzimuth),
           backsightAzimuth: parseAngle(shots[i]?.backsightAzimuth),
           frontsightInclination: parseAngle(shots[i]?.frontsightInclination),

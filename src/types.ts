@@ -13,12 +13,43 @@ export const StationAndLruds = z.object({
 const Azimuth = z.number().min(0).lt(360).finite()
 const Inclination = z.number().gte(-90).lte(90).finite()
 
+const Distance = invertible(
+  z
+    .string()
+    .regex(
+      /^\s*[-+]?(\d+(\.\d*)?|\.\d+)(e[-+]?\d+)?\s*(\*\s*)?$/i,
+      'invalid number'
+    ),
+  (s) =>
+    /\s*\*\s*$/.test(s)
+      ? ([
+          parseFloat(s.replace(/\s*\*\s*$/, '')),
+          { excluded: true },
+        ] satisfies [number, { excluded: true }])
+      : parseFloat(s),
+  z.union([
+    z.number().positive().finite(),
+    z
+      .tuple([z.number(), z.object({ excluded: z.literal(true) })])
+      .refine((z) => z[0] > 0, 'Number must be greater than 0')
+      .refine((z) => Number.isFinite(z[0]), 'Number must be finite'),
+  ]),
+  (d) => (typeof d === 'number' ? String(d) : `${d[0]} *`)
+)
+
+export function distanceValue(distance?: z.output<typeof Distance>) {
+  return typeof distance === 'number' ? distance : distance?.[0]
+}
+export function isDistanceExcluded(distance?: z.output<typeof Distance>) {
+  return Array.isArray(distance) ? distance[1].excluded : false
+}
+
 export type Shot = z.output<typeof Shot>
 export const Shot = z.object({
   from: StationAndLruds.optional(),
   to: StationAndLruds.optional(),
   isSplit: z.boolean().optional(),
-  distance: z.number().positive().nonnegative().finite().optional(),
+  distance: Distance.optional(),
   frontsightAzimuth: Azimuth.optional(),
   backsightAzimuth: Azimuth.optional(),
   frontsightInclination: Inclination.optional(),

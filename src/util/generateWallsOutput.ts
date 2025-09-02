@@ -1,4 +1,4 @@
-import { Values } from '../types'
+import { distanceValue, Values } from '../types'
 import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
 import {
   CompassAndTapeItem,
@@ -91,7 +91,7 @@ export function generateWallsOutput({
           : shots[i + 1]?.from?.station
         if (!to) continue
 
-        const distance = parseDistance(shots[i]?.distance)
+        const distance = parseDistance(distanceValue(shots[i]?.distance))
         if (!distance) continue
         lines.push({
           type: SrvLineType.Shot,
