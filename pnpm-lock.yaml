@@ -65,12 +65,18 @@ dependencies:
   simple-homography:
     specifier: ^1.0.2
     version: 1.0.2
+  tell-me-when:
+    specifier: ^1.2.1
+    version: 1.2.1
   uuid:
     specifier: ^10.0.0
     version: 10.0.0
   zod:
     specifier: ^3.23.8
     version: 3.23.8
+  zod-invertible:
+    specifier: ^1.2.1
+    version: 1.2.1(zod@3.23.8)
 
 devDependencies:
   '@jcoreio/eslint-plugin-implicit-dependencies':
@@ -5712,6 +5718,12 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  /tell-me-when@1.2.1:
+    resolution: {integrity: sha512-0pLRfssLRD4S/TGAR2qYAEuGZrBLoCSJQ05tmcACM+6W9LK8sbvJquo8Ldf/XpOStE1jXS1tVs1astJ//jC04w==}
+    engines: {node: '>=16'}
+    hasBin: true
+    dev: false
 
   /test-exclude@6.0.0:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}

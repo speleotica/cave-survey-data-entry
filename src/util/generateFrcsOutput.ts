@@ -16,6 +16,7 @@ export async function generateFrcsOutput({
       : Angle.degrees
   const header: FrcsTripHeader = {
     name: tripHeader.name,
+    date: tripHeader.date,
     team: (tripHeader.team?.includes(';')
       ? tripHeader.team.split(';')
       : tripHeader.team?.split(',')

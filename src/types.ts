@@ -1,4 +1,6 @@
 import z from 'zod'
+import { invertible } from 'zod-invertible'
+import { tellMeWhen } from 'tell-me-when'
 
 export const StationAndLruds = z.object({
   station: z.string().trim().optional(),
@@ -86,10 +88,35 @@ export const LengthUnit = z.enum(['meters', 'feet'])
 
 export const AngleUnit = z.enum(['degrees', 'gradians', 'mils'])
 
+export const TellMeWhenDate = invertible(
+  z.string().superRefine((s, ctx) => {
+    try {
+      tellMeWhen(s)
+    } catch (error) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: error instanceof Error ? error.message : String(error),
+      })
+    }
+  }),
+  (s) => {
+    try {
+      const parsed = tellMeWhen(s)
+      if (Array.isArray(parsed)) return parsed[0]
+      return parsed
+    } catch (error) {
+      return new Date(NaN)
+    }
+  },
+  z.date(),
+  (d) => d.toLocaleDateString()
+)
+
 export const TripHeader = z.object({
   cave: z.string().trim().optional(),
   name: z.string().trim().default(''),
   team: z.string().trim().default(''),
+  date: TellMeWhenDate.optional(),
   distanceUnit: LengthUnit,
   angleUnit: AngleUnit,
   backsightAzimuthCorrected: z.boolean().default(true).optional(),

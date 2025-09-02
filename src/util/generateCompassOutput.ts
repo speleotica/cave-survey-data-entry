@@ -22,7 +22,7 @@ export function generateCompassOutput({ tripHeader, pages }: Values): string {
     cave: tripHeader.cave || '',
     name: tripHeader.name,
     team: tripHeader.team,
-    date: new Date(),
+    date: tripHeader.date || new Date(),
     declination: Unitize.degrees(0),
     distanceUnit,
     azimuthUnit:

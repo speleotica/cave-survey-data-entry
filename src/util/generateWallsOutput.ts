@@ -16,6 +16,7 @@ export function generateWallsOutput({
     cave,
     name,
     team,
+    date,
     distanceUnit,
     angleUnit,
     backsightAzimuthCorrected,
@@ -27,6 +28,7 @@ export function generateWallsOutput({
   if (cave) lines.push({ type: SrvLineType.Comment, comment: `Cave: ${cave}` })
   if (name) lines.push({ type: SrvLineType.Comment, comment: `Trip: ${name}` })
   if (team) lines.push({ type: SrvLineType.Comment, comment: `Team: ${team}` })
+  if (date) lines.push({ type: SrvLineType.DateDirective, date })
   lines.push({
     type: SrvLineType.UnitsDirective,
     options: [

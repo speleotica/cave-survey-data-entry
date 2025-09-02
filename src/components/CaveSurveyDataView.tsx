@@ -59,7 +59,7 @@ function Home2() {
     }
   }, [])
 
-  useInitialize({ values: initialValues }, [])
+  useInitialize({ parsedValues: initialValues }, [])
 
   const { value: hideHeader, setValue: setHideHeader } =
     form.useField('hideHeader')
@@ -130,7 +130,7 @@ function Home2() {
                 gap: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'flex-start',
+                alignItems: 'stretch',
                 overflow: 'hidden',
               }}
             >
@@ -140,12 +140,22 @@ function Home2() {
                 field={form.get('tripHeader.cave')}
                 fullWidth
               />
-              <FormTextField
-                type="text"
-                label="Trip Name"
-                field={form.get('tripHeader.name')}
-                fullWidth
-              />
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                <FormTextField
+                  type="text"
+                  label="Trip Name"
+                  field={form.get('tripHeader.name')}
+                  sx={{ flex: '1 1 auto' }}
+                  fullWidth
+                />
+                <FormTextField
+                  type="text"
+                  label="Trip Date"
+                  field={form.get('tripHeader.date')}
+                  sx={{ flex: '1 1 auto' }}
+                  fullWidth
+                />
+              </Box>
               <FormTextField
                 type="text"
                 label="Survey Team"
