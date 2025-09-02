@@ -12,26 +12,45 @@ import {
 } from '@speleotica/walls/srv'
 
 export function generateWallsOutput({
-  backsightAzimuthCorrected,
-  backsightInclinationCorrected,
+  tripHeader: {
+    cave,
+    name,
+    team,
+    distanceUnit,
+    angleUnit,
+    backsightAzimuthCorrected,
+    backsightInclinationCorrected,
+  },
   pages,
 }: Values): string {
-  if (!pages.length) return ''
   const lines: SrvLine[] = []
+  if (cave) lines.push({ type: SrvLineType.Comment, comment: `Cave: ${cave}` })
+  if (name) lines.push({ type: SrvLineType.Comment, comment: `Trip: ${name}` })
+  if (team) lines.push({ type: SrvLineType.Comment, comment: `Team: ${team}` })
   lines.push({
     type: SrvLineType.UnitsDirective,
     options: [
       {
         type: UnitsOptionType.DistanceUnit,
-        unit: Length.feet,
+        unit: distanceUnit === 'feet' ? Length.feet : Length.meters,
       },
       {
         type: UnitsOptionType.FrontsightAzimuthUnit,
-        unit: Angle.degrees,
+        unit:
+          angleUnit === 'gradians'
+            ? Angle.gradians
+            : angleUnit === 'mils'
+            ? Angle.milsNATO
+            : Angle.degrees,
       },
       {
         type: UnitsOptionType.FrontsightInclinationUnit,
-        unit: Angle.degrees,
+        unit:
+          angleUnit === 'gradians'
+            ? Angle.gradians
+            : angleUnit === 'mils'
+            ? Angle.milsNATO
+            : Angle.degrees,
       },
       {
         type: UnitsOptionType.Order,

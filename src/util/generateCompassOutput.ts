@@ -13,18 +13,28 @@ import {
   LrudAssociation,
 } from '@speleotica/compass/dat'
 
-export function generateCompassOutput({ pages }: Values): string {
-  if (!pages.length) return ''
+export function generateCompassOutput({ tripHeader, pages }: Values): string {
+  const distanceUnit =
+    tripHeader.distanceUnit === 'meters'
+      ? DistanceUnit.Meters
+      : DistanceUnit.FeetAndInches
   const header: CompassTripHeader = {
-    cave: 'Cave',
-    name: 'Trip',
+    cave: tripHeader.cave || '',
+    name: tripHeader.name,
+    team: tripHeader.team,
     date: new Date(),
     declination: Unitize.degrees(0),
-    distanceUnit: DistanceUnit.DecimalFeet,
-    azimuthUnit: AzimuthUnit.Degrees,
-    inclinationUnit: InclinationUnit.Degrees,
+    distanceUnit,
+    azimuthUnit:
+      tripHeader.angleUnit === 'gradians'
+        ? AzimuthUnit.Gradians
+        : AzimuthUnit.Degrees,
+    inclinationUnit:
+      tripHeader.angleUnit === 'gradians'
+        ? InclinationUnit.Gradians
+        : InclinationUnit.Degrees,
     hasRedundantBacksights: true,
-    lrudUnit: DistanceUnit.DecimalFeet,
+    lrudUnit: distanceUnit,
     shotOrder: [
       ShotItem.Distance,
       ShotItem.FrontsightAzimuth,
@@ -49,15 +59,21 @@ export function generateCompassOutput({ pages }: Values): string {
         const excludeDistance = false
         const distance = parseDistance(shots[i]?.distance)
         if (!distance) continue
+        let backsightAzimuth = parseAngle(shots[i]?.backsightAzimuth)
+        if (backsightAzimuth && tripHeader.backsightAzimuthCorrected)
+          backsightAzimuth = Angle.opposite(backsightAzimuth)
+        let backsightInclination = parseAngle(shots[i]?.backsightInclination)
+        if (backsightInclination && tripHeader.backsightInclinationCorrected)
+          backsightInclination = backsightInclination.negate()
         compassShots.push({
           from,
           to,
           distance,
           excludeDistance,
           frontsightAzimuth: parseAngle(shots[i]?.frontsightAzimuth),
-          backsightAzimuth: parseAngle(shots[i]?.backsightAzimuth),
+          backsightAzimuth,
           frontsightInclination: parseAngle(shots[i]?.frontsightInclination),
-          backsightInclination: parseAngle(shots[i]?.backsightInclination),
+          backsightInclination,
           ...(shots[i + 1]?.isSplit
             ? {
                 left: parseDistance(shots[i + 1]?.to?.left),

@@ -82,18 +82,34 @@ export const Page = z.object({
   tables: z.array(Table).default([]),
 })
 
+export const LengthUnit = z.enum(['meters', 'feet'])
+
+export const AngleUnit = z.enum(['degrees', 'gradians', 'mils'])
+
+export const TripHeader = z.object({
+  cave: z.string().trim().optional(),
+  name: z.string().trim().default(''),
+  team: z.string().trim().default(''),
+  distanceUnit: LengthUnit,
+  angleUnit: AngleUnit,
+  backsightAzimuthCorrected: z.boolean().default(true).optional(),
+  backsightInclinationCorrected: z.boolean().default(true).optional(),
+})
+
 export type Values = z.output<typeof Values>
 export const Values = z
   .object({
     outputFormat: z.enum(['FRCS', 'Compass', 'Walls']).optional(),
-    backsightAzimuthCorrected: z.boolean().default(true).optional(),
-    backsightInclinationCorrected: z.boolean().default(true).optional(),
+    tripHeader: TripHeader,
+    hideHeader: z.boolean().optional(),
     hideOverlay: z.boolean().optional(),
     pages: z.array(Page).default([]),
   })
   .superRefine((values, ctx) => {
-    const { backsightAzimuthCorrected, backsightInclinationCorrected, pages } =
-      values
+    const {
+      tripHeader: { backsightAzimuthCorrected, backsightInclinationCorrected },
+      pages,
+    } = values
     for (let p = 0; p < pages.length; p++) {
       const { tables } = pages[p]
       for (let t = 0; t < tables.length; t++) {

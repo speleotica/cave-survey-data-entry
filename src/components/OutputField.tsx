@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { TextField } from '@mui/material'
-import throttle from 'lodash/throttle'
+import asyncThrottle from '@jcoreio/async-throttle'
 import { generateFrcsOutput } from '../util/generateFrcsOutput'
 import { Values } from '../types'
 import { form } from '../form'
@@ -13,26 +13,27 @@ export function OutputField(props: React.ComponentProps<typeof TextField>) {
 
   const handleChange = React.useMemo(
     () =>
-      throttle((values: Values) => {
-        setTimeout(() => {
-          try {
-            setValue(
-              values.outputFormat === 'FRCS'
-                ? generateFrcsOutput(values)
-                : values.outputFormat === 'Compass'
-                ? generateCompassOutput(values)
-                : values.outputFormat === 'Walls'
-                ? generateWallsOutput(values)
-                : ''
-            )
-          } catch (error) {
-            setValue(
-              error instanceof Error
-                ? error.stack || error.message
-                : String(error)
-            )
-          }
-        }, 0)
+      asyncThrottle(async (values: Values) => {
+        try {
+          const output =
+            values.outputFormat === 'FRCS'
+              ? await generateFrcsOutput(values)
+              : values.outputFormat === 'Compass'
+              ? await generateCompassOutput(values)
+              : values.outputFormat === 'Walls'
+              ? await generateWallsOutput(values)
+              : ''
+
+          setTimeout(() => {
+            setValue(output)
+          }, 0)
+        } catch (error) {
+          setValue(
+            error instanceof Error
+              ? error.stack || error.message
+              : String(error)
+          )
+        }
       }, 500),
     []
   )

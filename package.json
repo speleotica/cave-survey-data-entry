@@ -16,6 +16,7 @@
     "@emotion/css": "^11.11.2",
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
+    "@jcoreio/async-throttle": "^1.6.1",
     "@jcoreio/zod-forms": "^2.0.4",
     "@mui/icons-material": "^5.15.18",
     "@mui/material": "latest",

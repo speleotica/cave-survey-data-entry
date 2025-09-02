@@ -3,7 +3,7 @@ import Box from '@mui/material/Box'
 import { OutputField } from './OutputField'
 import { Values } from '../types'
 import throttle from 'lodash/throttle'
-import { Button, MenuItem } from '@mui/material'
+import { Button, Collapse, IconButton, MenuItem, Tooltip } from '@mui/material'
 import { SplitPane } from './SplitPane'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createIdb, Idb } from '@/idb/idb'
@@ -12,6 +12,7 @@ import { form } from '../form'
 import { FormSwitchField } from './FormSwitchField'
 import { SurveySheetsField } from './SurveySheetsField'
 import { FormTextField } from './FormTextField'
+import { ArrowDropDown } from '@mui/icons-material'
 
 const queryClient = new QueryClient()
 
@@ -45,14 +46,28 @@ function Home2() {
     } catch (error) {
       return {
         outputFormat: 'FRCS',
-        backsightAzimuthCorrected: true,
-        backsightInclinationCorrected: true,
+        tripHeader: {
+          name: '',
+          team: '',
+          angleUnit: 'degrees',
+          distanceUnit: 'feet',
+          backsightAzimuthCorrected: true,
+          backsightInclinationCorrected: true,
+        },
         pages: [],
       }
     }
   }, [])
 
   useInitialize({ values: initialValues }, [])
+
+  const { value: hideHeader, setValue: setHideHeader } =
+    form.useField('hideHeader')
+
+  const toggleHeader = React.useCallback(
+    () => setHideHeader(!hideHeader),
+    [hideHeader, setHideHeader]
+  )
 
   return (
     <>
@@ -78,9 +93,10 @@ function Home2() {
           sx={{
             flexGrow: 1,
             flexShrink: 1,
+            gap: 1,
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'flex-start',
+            alignItems: 'stretch',
             overflow: 'hidden',
           }}
         >
@@ -91,17 +107,96 @@ function Home2() {
               field={form.get('hideOverlay')}
               label="Hide Overlay (Alt/⌥)"
             />
+            <Box sx={{ flex: 1 }} />
+            <Tooltip
+              title={hideHeader ? 'Show Trip Header' : 'Hide Trip Header'}
+            >
+              <IconButton onClick={toggleHeader}>
+                <ArrowDropDown
+                  sx={{
+                    transition: 'transform',
+                    transform: hideHeader ? 'scaleY(1)' : 'scaleY(-1)',
+                  }}
+                />
+              </IconButton>
+            </Tooltip>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 4, mb: 2 }}>
-            <FormSwitchField
-              field={form.get('backsightAzimuthCorrected')}
-              label="Corrected Backsight Azimuths"
-            />
-            <FormSwitchField
-              field={form.get('backsightInclinationCorrected')}
-              label="Corrected Backsight Inclinations"
-            />
-          </Box>
+          <Collapse in={!hideHeader}>
+            <Box
+              sx={{
+                p: 1,
+                flexGrow: 1,
+                flexShrink: 1,
+                gap: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                overflow: 'hidden',
+              }}
+            >
+              <FormTextField
+                type="text"
+                label="Cave Name"
+                field={form.get('tripHeader.cave')}
+                fullWidth
+              />
+              <FormTextField
+                type="text"
+                label="Trip Name"
+                field={form.get('tripHeader.name')}
+                fullWidth
+              />
+              <FormTextField
+                type="text"
+                label="Survey Team"
+                field={form.get('tripHeader.team')}
+                fullWidth
+              />
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 1,
+                  mb: 2,
+                  alignSelf: 'stretch',
+                }}
+              >
+                <FormTextField
+                  type="text"
+                  field={form.get('tripHeader.distanceUnit')}
+                  label="Distance Unit"
+                  select
+                  fullWidth
+                >
+                  <MenuItem value="meters">Meters</MenuItem>
+                  <MenuItem value="feet">Feet</MenuItem>
+                </FormTextField>
+                <FormTextField
+                  type="text"
+                  field={form.get('tripHeader.angleUnit')}
+                  label="Angle Unit"
+                  select
+                  fullWidth
+                >
+                  <MenuItem value="degrees">Degrees</MenuItem>
+                  <MenuItem value="gradians">Gradians</MenuItem>
+                  <MenuItem value="mils">Mils</MenuItem>
+                </FormTextField>
+              </Box>
+              <Box
+                sx={{ display: 'flex', flexDirection: 'row', gap: 4, mb: 2 }}
+              >
+                <FormSwitchField
+                  field={form.get('tripHeader.backsightAzimuthCorrected')}
+                  label="Corrected Backsight Azimuths"
+                />
+                <FormSwitchField
+                  field={form.get('tripHeader.backsightInclinationCorrected')}
+                  label="Corrected Backsight Inclinations"
+                />
+              </Box>
+            </Box>
+          </Collapse>
           <SurveySheetsField />
         </Box>
         <Box

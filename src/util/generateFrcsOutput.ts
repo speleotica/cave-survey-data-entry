@@ -1,15 +1,33 @@
 import { Values } from '../types'
 import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
 import { FrcsShot, FrcsShotKind } from '@speleotica/frcsdata/FrcsShot'
-import { FrcsTripHeader, formatFrcsShot } from '@speleotica/frcsdata'
+import { FrcsTripHeader, formatFrcsSurveyFile } from '@speleotica/frcsdata'
+import { slurp } from './slurp'
 
-export function generateFrcsOutput({ pages }: Values): string {
-  if (!pages.length) return ''
+export async function generateFrcsOutput({
+  tripHeader,
+  pages,
+}: Values): Promise<string> {
+  const angleUnit =
+    tripHeader.angleUnit === 'mils'
+      ? Angle.milsNATO
+      : tripHeader.angleUnit === 'gradians'
+      ? Angle.gradians
+      : Angle.degrees
   const header: FrcsTripHeader = {
-    name: 'Trip',
-    distanceUnit: Length.feet,
-    azimuthUnit: Angle.degrees,
-    inclinationUnit: Angle.degrees,
+    name: tripHeader.name,
+    team: (tripHeader.team?.includes(';')
+      ? tripHeader.team.split(';')
+      : tripHeader.team?.split(',')
+    )?.map((s) => s.trim()),
+    distanceUnit:
+      tripHeader.distanceUnit === 'meters' ? Length.meters : Length.feet,
+    azimuthUnit: angleUnit,
+    inclinationUnit: angleUnit,
+    hasBacksightAzimuth: true,
+    hasBacksightInclination: true,
+    backsightAzimuthCorrected: tripHeader.backsightAzimuthCorrected,
+    backsightInclinationCorrected: tripHeader.backsightInclinationCorrected,
   }
   const frcsShots: FrcsShot[] = []
   for (const { tables } of pages) {
@@ -56,7 +74,22 @@ export function generateFrcsOutput({ pages }: Values): string {
       }
     }
   }
-  return frcsShots.map((shot) => formatFrcsShot(shot, header)).join('\n')
+  return (
+    (tripHeader.cave ? '' : ` *\n`) +
+    (
+      await slurp(
+        formatFrcsSurveyFile({
+          cave: tripHeader.cave,
+          trips: [
+            {
+              header,
+              shots: frcsShots,
+            },
+          ],
+        })
+      )
+    ).join('')
+  )
 }
 
 function parseDistance(
