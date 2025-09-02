@@ -53,6 +53,8 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
     layoutVariant === 'FromStaDisAzIncLrUd' ||
     layoutVariant === 'ToStaDisAzIncLrUd'
       ? 26
+      : layoutVariant === 'X-39'
+      ? 10
       : 11
   return (
     <Box
@@ -126,7 +128,12 @@ const SurveyRow = ({
     position: 'relative',
     flexGrow: 0,
     flexShrink: 0,
-    flexBasis: layoutVariant === 'Lech' ? '19%' : '16%',
+    flexBasis:
+      layoutVariant === 'Lech'
+        ? '19%'
+        : layoutVariant === 'X-39'
+        ? '18%'
+        : '16%',
     '&:not(:hover) > :nth-child(1)': {
       visibility: 'hidden',
     },
@@ -222,7 +229,13 @@ const SurveyRow = ({
           flexGrow: 0,
           flexShrink: 0,
           flexBasis:
-            layoutVariant === 'Lech' ? '37.5%' : isSimpleGrid ? '50%' : '40%',
+            layoutVariant === 'Lech'
+              ? '37.5%'
+              : layoutVariant === 'X-39'
+              ? '39%'
+              : isSimpleGrid
+              ? '50%'
+              : '40%',
           pointerEvents: 'none',
         }}
       >
@@ -245,14 +258,14 @@ const SurveyRow = ({
               index={index}
               useFieldProps={useFieldProps?.distance}
               sx={{
-                flexBasis: 0,
+                flexBasis: layoutVariant === 'X-39' ? '40%' : 0,
                 flexGrow: 1,
                 flexShrink: 1,
               }}
             />
             <Split
               sx={{
-                flexBasis: 0,
+                flexBasis: layoutVariant === 'X-39' ? '30%' : 0,
                 flexGrow: 1,
                 flexShrink: 1,
                 flexDirection: isSimpleGrid ? 'row' : 'column',
@@ -273,7 +286,7 @@ const SurveyRow = ({
             </Split>
             <Split
               sx={{
-                flexBasis: 0,
+                flexBasis: layoutVariant === 'X-39' ? '30%' : 0,
                 flexGrow: 1,
                 flexShrink: 1,
                 flexDirection: isSimpleGrid ? 'row' : 'column',
@@ -295,6 +308,20 @@ const SurveyRow = ({
           </Box>
         )}
       </Box>
+      {layoutVariant === 'X-39' ? (
+        <SurveyTextField
+          x={xs.notes}
+          y={y}
+          h={isSimpleGrid ? 1 : 2}
+          index={index}
+          useFieldProps={useFieldProps?.notes}
+          sx={{
+            flexGrow: 0,
+            flexShrink: 0,
+            flexBasis: '12%',
+          }}
+        />
+      ) : undefined}
       <Box
         sx={{
           flexBasis: 0,
@@ -333,7 +360,7 @@ const SurveyRow = ({
             />
           )
         )}
-        {isSimpleGrid ? undefined : (
+        {isSimpleGrid || layoutVariant === 'X-39' ? undefined : (
           <SurveyTextField
             x={xs.notes}
             y={y}
