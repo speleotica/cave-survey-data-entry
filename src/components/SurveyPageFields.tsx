@@ -49,13 +49,7 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
   useFieldProps?: UseFieldPropsMap
   layoutVariant?: LayoutVariant
 }) {
-  const numRows =
-    layoutVariant === 'FromStaDisAzIncLrUd' ||
-    layoutVariant === 'ToStaDisAzIncLrUd'
-      ? 26
-      : layoutVariant === 'X-39'
-      ? 10
-      : 11
+  const numRows = layoutSpecs[layoutVariant].numRows
   return (
     <Box
       sx={{
@@ -85,6 +79,99 @@ export const SurveyPageFields = React.memo(function SurveyPageFields({
 
 const lrudDirs = ['left', 'right', 'up', 'down'] as const
 
+type StaggeredLayoutSpec = {
+  staggered: true
+  numRows: number
+  stationWidth: string
+  shotWidth: string
+  distanceWidth?: string
+  azimuthWidth?: string
+  inclinationWidth?: string
+  lrudWidth?: string
+  lrudWidths?: { [K in (typeof lrudDirs)[number]]?: string }
+  downWidth?: string
+  notes?: 'afterLrud' | 'afterInclination'
+  notesWidth?: string
+}
+
+type UnstaggeredLayoutSpec = {
+  staggered: false
+  numRows: number
+  station: 'from' | 'to'
+  stationWidth: string
+  shotWidth: string
+  distanceWidth?: string
+  azimuthWidth?: undefined
+  inclinationWidth?: undefined
+  lrudWidth?: string
+  lrudWidths?: { [K in (typeof lrudDirs)[number]]?: string }
+  notes?: undefined
+  notesWidth?: undefined
+}
+
+type LayoutSpec = StaggeredLayoutSpec | UnstaggeredLayoutSpec
+
+const layoutSpecs: Record<LayoutVariant, LayoutSpec> = {
+  Lech: {
+    staggered: true,
+    numRows: 11,
+    stationWidth: '19%',
+    shotWidth: '37.5%',
+    notes: 'afterLrud',
+    notesWidth: '43%',
+  },
+  IMO: {
+    staggered: true,
+    numRows: 11,
+    stationWidth: '16%',
+    shotWidth: '40%',
+    notes: 'afterLrud',
+    notesWidth: '30%',
+  },
+  'X-38': {
+    staggered: true,
+    numRows: 10,
+    stationWidth: '18%',
+    shotWidth: '38%',
+    distanceWidth: '38%',
+    azimuthWidth: '30%',
+    inclinationWidth: '30%',
+    notes: 'afterInclination',
+    notesWidth: '12%',
+  },
+  'X-39': {
+    staggered: true,
+    numRows: 10,
+    stationWidth: '18%',
+    shotWidth: '38.5%',
+    distanceWidth: '38%',
+    azimuthWidth: '30%',
+    inclinationWidth: '30%',
+    lrudWidths: {
+      left: '23%',
+      right: '23%',
+      up: '25%',
+      down: '28%',
+    },
+    notes: 'afterInclination',
+    notesWidth: '12%',
+  },
+  FromStaDisAzIncLrUd: {
+    staggered: false,
+    numRows: 26,
+    station: 'from',
+    stationWidth: '16%',
+    shotWidth: '50%',
+  },
+  ToStaDisAzIncLrUd: {
+    staggered: false,
+    numRows: 26,
+    station: 'to',
+    stationWidth: '16%',
+    shotWidth: '50%',
+  },
+}
+
 const SurveyRow = ({
   sx,
   index,
@@ -99,24 +186,24 @@ const SurveyRow = ({
   includeShotFields?: boolean
 }) => {
   const isSplitProps = useFieldProps?.isSplit?.(index)
-  const isSimpleGrid =
-    layoutVariant === 'FromStaDisAzIncLrUd' ||
-    layoutVariant === 'ToStaDisAzIncLrUd'
-  const isSplit = isSimpleGrid ? false : isSplitProps?.value === true
-  const stationIndex = layoutVariant === 'ToStaDisAzIncLrUd' ? index + 1 : index
+  const spec = layoutSpecs[layoutVariant]
+  const { staggered } = spec
+  const isSplit = staggered ? isSplitProps?.value === true : false
+  const stationIndex =
+    spec.staggered || spec.station !== 'to' ? index : index + 1
 
   let x = 0
-  const y = isSimpleGrid ? index : index * 2
-  const fsY = isSimpleGrid ? y : y + 1
-  const bsY = isSimpleGrid ? y : y + 2
+  const y = staggered ? index * 2 : index
+  const fsY = staggered ? y + 1 : y
+  const bsY = staggered ? y + 2 : y
   const xs = {
     fromStation: x,
     toStation: x,
     distance: ++x,
     frontsightAzimuth: ++x,
-    backsightAzimuth: isSimpleGrid ? ++x : x,
+    backsightAzimuth: staggered ? x : ++x,
     frontsightInclination: ++x,
-    backsightInclination: isSimpleGrid ? ++x : x,
+    backsightInclination: staggered ? x : ++x,
     left: ++x,
     right: ++x,
     up: ++x,
@@ -128,12 +215,7 @@ const SurveyRow = ({
     position: 'relative',
     flexGrow: 0,
     flexShrink: 0,
-    flexBasis:
-      layoutVariant === 'Lech'
-        ? '19%'
-        : layoutVariant === 'X-39'
-        ? '18%'
-        : '16%',
+    flexBasis: spec.stationWidth,
     '&:not(:hover) > :nth-child(1)': {
       visibility: 'hidden',
     },
@@ -191,9 +273,7 @@ const SurveyRow = ({
             display: 'flex',
           }}
         >
-          {isSimpleGrid ? (
-            <span />
-          ) : (
+          {staggered ? (
             <Tooltip title="Split row" placement="right">
               <Fab
                 size="small"
@@ -213,11 +293,13 @@ const SurveyRow = ({
                 <ViewStream />
               </Fab>
             </Tooltip>
+          ) : (
+            <span />
           )}
           <SurveyTextField
             x={xs.fromStation}
             y={y}
-            h={isSimpleGrid ? 1 : 2}
+            h={staggered ? 2 : 1}
             index={stationIndex}
             useFieldProps={useFieldProps?.from?.station}
           />
@@ -228,14 +310,7 @@ const SurveyRow = ({
           position: 'relative',
           flexGrow: 0,
           flexShrink: 0,
-          flexBasis:
-            layoutVariant === 'Lech'
-              ? '37.5%'
-              : layoutVariant === 'X-39'
-              ? '39%'
-              : isSimpleGrid
-              ? '50%'
-              : '40%',
+          flexBasis: spec.shotWidth,
           pointerEvents: 'none',
         }}
       >
@@ -243,7 +318,7 @@ const SurveyRow = ({
           <Box
             sx={{
               position: 'absolute',
-              top: isSimpleGrid ? '0%' : '50%',
+              top: staggered ? '50%' : '0%',
               width: '100%',
               height: '100%',
               display: 'flex',
@@ -254,21 +329,21 @@ const SurveyRow = ({
             <SurveyTextField
               x={xs.distance}
               y={fsY}
-              h={isSimpleGrid ? 1 : 2}
+              h={staggered ? 2 : 1}
               index={index}
               useFieldProps={useFieldProps?.distance}
               sx={{
-                flexBasis: layoutVariant === 'X-39' ? '40%' : 0,
+                flexBasis: spec.distanceWidth ?? 0,
                 flexGrow: 1,
                 flexShrink: 1,
               }}
             />
             <Split
               sx={{
-                flexBasis: layoutVariant === 'X-39' ? '30%' : 0,
+                flexBasis: spec.azimuthWidth ?? 0,
                 flexGrow: 1,
                 flexShrink: 1,
-                flexDirection: isSimpleGrid ? 'row' : 'column',
+                flexDirection: staggered ? 'column' : 'row',
               }}
             >
               <AngleField
@@ -286,10 +361,10 @@ const SurveyRow = ({
             </Split>
             <Split
               sx={{
-                flexBasis: layoutVariant === 'X-39' ? '30%' : 0,
+                flexBasis: spec.inclinationWidth ?? 0,
                 flexGrow: 1,
                 flexShrink: 1,
-                flexDirection: isSimpleGrid ? 'row' : 'column',
+                flexDirection: staggered ? 'column' : 'row',
               }}
             >
               <AngleField
@@ -308,11 +383,11 @@ const SurveyRow = ({
           </Box>
         )}
       </Box>
-      {layoutVariant === 'X-39' ? (
+      {spec.notes === 'afterInclination' ? (
         <SurveyTextField
           x={xs.notes}
           y={y}
-          h={isSimpleGrid ? 1 : 2}
+          h={staggered ? 2 : 1}
           index={index}
           useFieldProps={useFieldProps?.notes}
           sx={{
@@ -324,7 +399,7 @@ const SurveyRow = ({
       ) : undefined}
       <Box
         sx={{
-          flexBasis: 0,
+          flexBasis: spec.lrudWidth ?? 0,
           flexGrow: 1,
           flexShrink: 1,
           display: 'flex',
@@ -341,39 +416,48 @@ const SurveyRow = ({
                 y={y}
                 index={index}
                 useFieldProps={useFieldProps?.to?.[dir]}
+                sx={{
+                  flexBasis: spec.lrudWidths?.[dir] ?? 0,
+                }}
               />
               <SurveyTextField
                 x={xs[lrudDirs[lrudIndex]]}
                 y={y + 1}
                 index={index}
                 useFieldProps={useFieldProps?.from?.[dir]}
+                sx={{
+                  flexBasis: spec.lrudWidths?.[dir] ?? 0,
+                }}
               />
             </Split>
           ) : (
             <SurveyTextField
               x={xs[lrudDirs[lrudIndex]]}
               y={y}
-              h={isSimpleGrid ? 1 : 2}
+              h={staggered ? 2 : 1}
               key={dir}
               index={stationIndex}
               useFieldProps={useFieldProps?.from?.[dir]}
+              sx={{
+                flexBasis: spec.lrudWidths?.[dir] ?? 0,
+              }}
             />
           )
         )}
-        {isSimpleGrid || layoutVariant === 'X-39' ? undefined : (
+        {spec.notes === 'afterLrud' ? (
           <SurveyTextField
             x={xs.notes}
             y={y}
-            h={isSimpleGrid ? 1 : 2}
+            h={staggered ? 2 : 1}
             index={index}
             useFieldProps={useFieldProps?.notes}
             sx={{
               flexGrow: 0,
               flexShrink: 0,
-              flexBasis: layoutVariant === 'Lech' ? '43%' : '30%',
+              flexBasis: spec.notesWidth,
             }}
           />
-        )}
+        ) : undefined}
       </Box>
     </Box>
   )
@@ -516,9 +600,20 @@ const SurveyTextField = ({
           ...InputProps?.sx,
         },
         endAdornment: validationError ? (
-          <InputAdornment position="end" sx={{ mr: -1.5 }}>
+          <InputAdornment
+            position="end"
+            sx={{
+              mr: -1.5,
+            }}
+          >
             <Tooltip title={validationError}>
-              <Error sx={{ color: 'red', height: 16, width: 16 }} />
+              <Error
+                sx={{
+                  color: 'red',
+                  height: 16,
+                  width: 16,
+                }}
+              />
             </Tooltip>
           </InputAdornment>
         ) : undefined,

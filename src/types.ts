@@ -61,6 +61,7 @@ export type LayoutVariant = z.output<typeof LayoutVariant>
 export const LayoutVariant = z.enum([
   'IMO',
   'Lech',
+  'X-38',
   'X-39',
   'FromStaDisAzIncLrUd',
   'ToStaDisAzIncLrUd',
