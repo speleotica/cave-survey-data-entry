@@ -3,11 +3,11 @@ import React from 'react'
 import { SurveySheet } from './SurveySheet'
 import { form } from '../form'
 import { useIdb } from './IdbContext'
-import { Page, rectToTableBounds } from '../types'
+import { rectToTableBounds } from '../types'
 import * as uuid from 'uuid'
 
 export function SurveySheetsField() {
-  const { elements, pushParsed, remove } = form.useArrayField('pages')
+  const { elements, push, remove } = form.useArrayField('pages')
 
   const idb = useIdb()
   const handleDragOver = React.useCallback((event: React.DragEvent) => {
@@ -21,7 +21,7 @@ export function SurveySheetsField() {
       for (const file of files) {
         const imageId = uuid.v1()
         await idb.add('pageImages', file, imageId)
-        pushParsed({
+        push({
           imageId,
           tables: [
             {
@@ -34,10 +34,10 @@ export function SurveySheetsField() {
               }),
             },
           ],
-        } as Page)
+        })
       }
     },
-    [pushParsed]
+    [push]
   )
 
   return (
