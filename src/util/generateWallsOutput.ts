@@ -21,9 +21,16 @@ export function generateWallsOutput({
     angleUnit,
     backsightAzimuthCorrected,
     backsightInclinationCorrected,
+    frontsightBacksightTolerance,
   },
   pages,
 }: Values): string {
+  const angleUnitObj = angleUnit === 'mils' ? Angle.milsNATO : Angle[angleUnit]
+  const tolerance =
+    frontsightBacksightTolerance != null
+      ? new UnitizedNumber(frontsightBacksightTolerance, angleUnitObj)
+      : Unitize.degrees(2)
+
   const lines: SrvLine[] = []
   if (cave) lines.push({ type: SrvLineType.Comment, comment: `Cave: ${cave}` })
   if (name) lines.push({ type: SrvLineType.Comment, comment: `Trip: ${name}` })
@@ -70,13 +77,13 @@ export function generateWallsOutput({
       {
         type: UnitsOptionType.BacksightAzimuthType,
         isCorrected: backsightAzimuthCorrected || false,
-        tolerance: Unitize.degrees(2),
+        tolerance,
         doNotAverage: false,
       },
       {
         type: UnitsOptionType.BacksightInclinationType,
         isCorrected: backsightInclinationCorrected || false,
-        tolerance: Unitize.degrees(2),
+        tolerance,
         doNotAverage: false,
       },
     ],
