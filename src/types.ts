@@ -145,6 +145,7 @@ export const TellMeWhenDate = invertible(
   (d) => d.toLocaleDateString()
 )
 
+export type TripHeader = z.output<typeof TripHeader>
 export const TripHeader = z.object({
   cave: z.string().trim().optional(),
   name: z.string().trim().default(''),

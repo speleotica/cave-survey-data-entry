@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
 import { OutputField } from './OutputField'
-import { Values } from '../types'
+import { TripHeader, Values } from '../types'
 import throttle from 'lodash/throttle'
 import {
   Button,
@@ -45,6 +45,16 @@ export default function Home() {
   )
 }
 
+const initialTripHeader: TripHeader = {
+  name: '',
+  team: '',
+  angleUnit: 'degrees',
+  distanceUnit: 'feet',
+  backsightAzimuthCorrected: true,
+  backsightInclinationCorrected: true,
+  frontsightBacksightTolerance: 2,
+}
+
 function Home2() {
   const initialValues = React.useMemo((): Values | undefined => {
     try {
@@ -54,15 +64,7 @@ function Home2() {
     } catch (error) {
       return {
         outputFormat: 'FRCS',
-        tripHeader: {
-          name: '',
-          team: '',
-          angleUnit: 'degrees',
-          distanceUnit: 'feet',
-          backsightAzimuthCorrected: true,
-          backsightInclinationCorrected: true,
-          frontsightBacksightTolerance: 2,
-        },
+        tripHeader: initialTripHeader,
         pages: [],
       }
     }
@@ -271,12 +273,14 @@ function Home2() {
 }
 
 function ClearDataButton() {
-  const { value, setValue } = form.useField('pages')
+  const header = form.useField('tripHeader')
+  const pages = form.useField('pages')
   return (
     <Button
       onClick={() => {
-        setValue(
-          (value || []).map((page) => ({
+        header.setParsedValue(initialTripHeader)
+        pages.setValue(
+          (pages.value || []).map((page) => ({
             ...page,
             tables: page?.tables?.map((table) => ({
               ...table,
@@ -292,11 +296,13 @@ function ClearDataButton() {
 }
 
 function ClearAllButton() {
-  const { setValue } = form.useField('pages')
+  const header = form.useField('tripHeader')
+  const pages = form.useField('pages')
   return (
     <Button
       onClick={() => {
-        setValue([])
+        header.setParsedValue(initialTripHeader)
+        pages.setValue([])
       }}
     >
       Clear All
