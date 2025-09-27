@@ -1,6 +1,7 @@
 import z from 'zod'
 import { invertible } from 'zod-invertible'
 import { tellMeWhen } from 'tell-me-when'
+import { Angle, Unitize, UnitizedNumber } from '@speleotica/unitized'
 
 export const StationAndLruds = z.object({
   station: z.string().trim().optional(),
@@ -153,6 +154,7 @@ export const TripHeader = z.object({
   angleUnit: AngleUnit,
   backsightAzimuthCorrected: z.boolean().default(true).optional(),
   backsightInclinationCorrected: z.boolean().default(true).optional(),
+  frontsightBacksightTolerance: z.number().positive().default(2),
 })
 
 export type Values = z.output<typeof Values>
@@ -165,10 +167,20 @@ export const Values = z
     pages: z.array(Page).default([]),
   })
   .superRefine((values, ctx) => {
+    const { tripHeader, pages } = values
     const {
-      tripHeader: { backsightAzimuthCorrected, backsightInclinationCorrected },
-      pages,
-    } = values
+      backsightAzimuthCorrected,
+      backsightInclinationCorrected,
+      frontsightBacksightTolerance,
+    } = tripHeader
+    const angleUnit =
+      tripHeader.angleUnit === 'mils'
+        ? Angle.milsNATO
+        : Angle[tripHeader.angleUnit]
+    const tolerance =
+      frontsightBacksightTolerance != null
+        ? new UnitizedNumber(frontsightBacksightTolerance, angleUnit)
+        : Unitize.degrees(2)
     for (let p = 0; p < pages.length; p++) {
       const { tables } = pages[p]
       for (let t = 0; t < tables.length; t++) {
@@ -177,44 +189,47 @@ export const Values = z
           const shot = shots[s]
           if (!shot) continue
           const { frontsightAzimuth, frontsightInclination } = shot
-          let { backsightAzimuth, backsightInclination } = shot
+          const { backsightAzimuth, backsightInclination } = shot
 
           if (frontsightAzimuth != null && backsightAzimuth != null) {
-            if (!backsightAzimuthCorrected)
-              backsightAzimuth = (backsightAzimuth + 180) % 360
-            let diff = Math.abs(frontsightAzimuth - backsightAzimuth)
-            if (diff >= 180) diff = 360 - diff
-            if (diff > 2) {
+            const fsUnits = new UnitizedNumber(frontsightAzimuth, angleUnit)
+            let bsUnits = new UnitizedNumber(backsightAzimuth, angleUnit)
+            if (!backsightAzimuthCorrected) bsUnits = Angle.opposite(bsUnits)
+            let diff = fsUnits.sub(bsUnits).abs()
+            if (diff.compare(Unitize.degrees(180)) >= 0)
+              diff = Angle.opposite(diff)
+            if (diff.compare(tolerance) > 0) {
               const path = [...ctx.path, 'pages', p, 'tables', t, 'shots', s]
 
               ctx.addIssue({
                 path: [...path, 'frontsightAzimuth'],
                 code: z.ZodIssueCode.custom,
-                message: 'must be within 2 degrees of backsight',
+                message: `must be within ${tolerance.toString()} of backsight`,
               })
               ctx.addIssue({
                 path: [...path, 'backsightAzimuth'],
                 code: z.ZodIssueCode.custom,
-                message: 'must be within 2 degrees of frontsight',
+                message: `must be within ${tolerance.toString()} of frontsight`,
               })
             }
           }
           if (frontsightInclination != null && backsightInclination != null) {
-            if (!backsightInclinationCorrected)
-              backsightInclination = -backsightInclination
-            const diff = Math.abs(frontsightInclination - backsightInclination)
-            if (diff > 2) {
+            const fsUnits = new UnitizedNumber(frontsightInclination, angleUnit)
+            let bsUnits = new UnitizedNumber(backsightInclination, angleUnit)
+            if (!backsightInclinationCorrected) bsUnits = bsUnits.negate()
+            const diff = fsUnits.sub(bsUnits).abs()
+            if (diff.compare(tolerance) > 0) {
               const path = [...ctx.path, 'pages', p, 'tables', t, 'shots', s]
 
               ctx.addIssue({
                 path: [...path, 'frontsightInclination'],
                 code: z.ZodIssueCode.custom,
-                message: 'must be within 2 degrees of backsight',
+                message: `must be within ${tolerance.toString()} of backsight`,
               })
               ctx.addIssue({
                 path: [...path, 'backsightInclination'],
                 code: z.ZodIssueCode.custom,
-                message: 'must be within 2 degrees of frontsight',
+                message: `must be within ${tolerance.toString()} of frontsight`,
               })
             }
           }

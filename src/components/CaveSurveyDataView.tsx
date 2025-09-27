@@ -3,7 +3,14 @@ import Box from '@mui/material/Box'
 import { OutputField } from './OutputField'
 import { Values } from '../types'
 import throttle from 'lodash/throttle'
-import { Button, Collapse, IconButton, MenuItem, Tooltip } from '@mui/material'
+import {
+  Button,
+  Collapse,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Tooltip,
+} from '@mui/material'
 import { SplitPane } from './SplitPane'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createIdb, Idb } from '@/idb/idb'
@@ -13,6 +20,7 @@ import { FormSwitchField } from './FormSwitchField'
 import { SurveySheetsField } from './SurveySheetsField'
 import { FormTextField } from './FormTextField'
 import { ArrowDropDown } from '@mui/icons-material'
+import { UseField } from './UseField'
 
 const queryClient = new QueryClient()
 
@@ -53,6 +61,7 @@ function Home2() {
           distanceUnit: 'feet',
           backsightAzimuthCorrected: true,
           backsightInclinationCorrected: true,
+          frontsightBacksightTolerance: 2,
         },
         pages: [],
       }
@@ -198,6 +207,24 @@ function Home2() {
                   <MenuItem value="gradians">Gradians</MenuItem>
                   <MenuItem value="mils">Mils</MenuItem>
                 </FormTextField>
+                <FormTextField
+                  type="text"
+                  field={form.get('tripHeader.frontsightBacksightTolerance')}
+                  label="Backsight Tolerance"
+                  fullWidth
+                  inputProps={{
+                    sx: { textAlign: 'right' },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <UseField field={form.get('tripHeader.angleUnit')}>
+                          {({ value }) => value ?? null}
+                        </UseField>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
               </Box>
               <Box
                 sx={{ display: 'flex', flexDirection: 'row', gap: 4, mb: 2 }}
