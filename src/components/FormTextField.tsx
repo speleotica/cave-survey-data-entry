@@ -16,5 +16,7 @@ export function FormTextField({
   const { input, meta } = useHtmlField({ field, type })
   const hasError = meta.touched && meta.error != null
 
-  return <TextField {...input} error={hasError} {...props} />
+  return (
+    <TextField {...input} error={hasError} {...props} helperText={meta.error} />
+  )
 }
