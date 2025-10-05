@@ -8,7 +8,7 @@ import {
 } from '@mui/material'
 import * as React from 'react'
 import { LayoutVariant } from '../types'
-import { ViewStream, Error } from '@mui/icons-material'
+import { ViewStream, Error, Warning } from '@mui/icons-material'
 import {
   UseFieldProps as _UseFieldProps,
   FieldPathForValue,
@@ -234,7 +234,7 @@ const SurveyRow = ({
     >
       {isSplit ? (
         <Split sx={stationSx}>
-          <Tooltip title="Unsplit row" placement="right">
+          <Tooltip title="Unsplit row" placement="right" disableInteractive>
             <Fab
               size="small"
               tabIndex={-1}
@@ -274,7 +274,7 @@ const SurveyRow = ({
           }}
         >
           {staggered ? (
-            <Tooltip title="Split row" placement="right">
+            <Tooltip title="Split row" placement="right" disableInteractive>
               <Fab
                 size="small"
                 tabIndex={-1}
@@ -603,17 +603,30 @@ const SurveyTextField = ({
           <InputAdornment
             position="end"
             sx={{
+              ml: 0,
               mr: -1.5,
             }}
           >
-            <Tooltip title={validationError}>
-              <Error
-                sx={{
-                  color: 'red',
-                  height: 16,
-                  width: 16,
-                }}
-              />
+            <Tooltip
+              disableInteractive
+              title={
+                typeof validationError === 'string'
+                  ? validationError.replace(/Warning:\s+/, '')
+                  : validationError
+              }
+            >
+              {typeof validationError === 'string' &&
+              validationError.startsWith('Warning') ? (
+                <Warning sx={{ color: 'orange', height: 16, width: 16 }} />
+              ) : (
+                <Error
+                  sx={{
+                    color: 'red',
+                    height: 16,
+                    width: 16,
+                  }}
+                />
+              )}
             </Tooltip>
           </InputAdornment>
         ) : undefined,

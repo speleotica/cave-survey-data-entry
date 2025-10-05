@@ -55,22 +55,37 @@ const initialTripHeader: TripHeader = {
   frontsightBacksightTolerance: 2,
 }
 
+const defaultValues: Values = {
+  outputFormat: 'FRCS',
+  tripHeader: initialTripHeader,
+  pages: [],
+}
+
 function Home2() {
   const initialValues = React.useMemo((): Values | undefined => {
     try {
-      return Values.parse({
-        ...JSON.parse(localStorage.getItem('caveSurveyDataValues') || ''),
-      })
-    } catch (error) {
-      return {
-        outputFormat: 'FRCS',
-        tripHeader: initialTripHeader,
-        pages: [],
+      const parsed = JSON.parse(
+        localStorage.getItem('caveSurveyDataValues') || ''
+      )
+      if (typeof parsed !== 'object' || parsed == null) throw new Error()
+      if (!parsed.tripHeader) {
+        parsed.tripHeader = {}
+        for (const field of Object.keys(
+          defaultValues.tripHeader
+        ) as (keyof TripHeader)[]) {
+          if (parsed.tripHeader[field] == null) {
+            parsed.tripHeader[field] = defaultValues.tripHeader[field]
+          }
+        }
       }
+      if (!parsed.outputFormat) parsed.outputFormat = defaultValues.outputFormat
+      return parsed
+    } catch (error) {
+      return defaultValues
     }
   }, [])
 
-  useInitialize({ parsedValues: initialValues }, [])
+  useInitialize({ values: initialValues as any }, [])
 
   const { value: hideHeader, setValue: setHideHeader } =
     form.useField('hideHeader')
@@ -126,6 +141,7 @@ function Home2() {
             />
             <Box sx={{ flex: 1 }} />
             <Tooltip
+              disableInteractive
               title={hideHeader ? 'Show Trip Header' : 'Hide Trip Header'}
             >
               <IconButton onClick={toggleHeader}>

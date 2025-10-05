@@ -1,6 +1,6 @@
 import { createZodForm } from '@jcoreio/zod-forms'
-import { Values } from './types'
+import { ValidatedValues } from './types'
 
 export const form = createZodForm({
-  schema: Values,
+  schema: ValidatedValues,
 })
