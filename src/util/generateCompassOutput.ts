@@ -45,6 +45,28 @@ export function generateCompassOutput({ tripHeader, pages }: Values): string {
     lrudOrder: [LrudItem.Left, LrudItem.Up, LrudItem.Down, LrudItem.Right],
     lrudAssociation: LrudAssociation.ToStation,
   }
+
+  const unitizeDist =
+    tripHeader.distanceUnit === 'feet' ? Length.feet : Length.meters
+  const unitizeAngle =
+    tripHeader.angleUnit === 'gradians'
+      ? Angle.gradians
+      : tripHeader.angleUnit === 'mils'
+      ? Angle.milsNATO
+      : Angle.degrees
+
+  function parseDistance(
+    num: number | undefined
+  ): UnitizedNumber<Length> | undefined {
+    return num != null ? new UnitizedNumber(num, unitizeDist) : undefined
+  }
+
+  function parseAngle(
+    num: number | undefined
+  ): UnitizedNumber<Angle> | undefined {
+    return num != null ? new UnitizedNumber(num, unitizeAngle) : undefined
+  }
+
   const compassShots: CompassShot[] = []
   for (const { tables } of pages) {
     for (const { shots } of tables) {
@@ -95,16 +117,4 @@ export function generateCompassOutput({ tripHeader, pages }: Values): string {
     formatCompassTripHeader(header) +
     compassShots.map((shot) => formatCompassShot(header)(shot)).join('')
   )
-}
-
-function parseDistance(
-  num: number | undefined
-): UnitizedNumber<Length> | undefined {
-  return num != null ? Unitize.feet(num) : undefined
-}
-
-function parseAngle(
-  num: number | undefined
-): UnitizedNumber<Angle> | undefined {
-  return num != null ? Unitize.degrees(num) : undefined
 }

@@ -1,5 +1,5 @@
 import { distanceValue, isDistanceExcluded, Values } from '../types'
-import { UnitizedNumber, Length, Angle, Unitize } from '@speleotica/unitized'
+import { UnitizedNumber, Length, Angle } from '@speleotica/unitized'
 import { FrcsShot, FrcsShotKind } from '@speleotica/frcsdata/FrcsShot'
 import { FrcsTripHeader, formatFrcsSurveyFile } from '@speleotica/frcsdata'
 import { slurp } from './slurp'
@@ -30,6 +30,28 @@ export async function generateFrcsOutput({
     backsightAzimuthCorrected: tripHeader.backsightAzimuthCorrected,
     backsightInclinationCorrected: tripHeader.backsightInclinationCorrected,
   }
+
+  const unitizeDist =
+    tripHeader.distanceUnit === 'feet' ? Length.feet : Length.meters
+  const unitizeAngle =
+    tripHeader.angleUnit === 'gradians'
+      ? Angle.gradians
+      : tripHeader.angleUnit === 'mils'
+      ? Angle.milsNATO
+      : Angle.degrees
+
+  function parseDistance(
+    num: number | undefined
+  ): UnitizedNumber<Length> | undefined {
+    return num != null ? new UnitizedNumber(num, unitizeDist) : undefined
+  }
+
+  function parseAngle(
+    num: number | undefined
+  ): UnitizedNumber<Angle> | undefined {
+    return num != null ? new UnitizedNumber(num, unitizeAngle) : undefined
+  }
+
   const frcsShots: FrcsShot[] = []
   for (const { tables } of pages) {
     for (const { shots } of tables) {
@@ -90,16 +112,4 @@ export async function generateFrcsOutput({
       )
     ).join('')
   )
-}
-
-function parseDistance(
-  num: number | undefined
-): UnitizedNumber<Length> | undefined {
-  return num != null ? Unitize.feet(num) : undefined
-}
-
-function parseAngle(
-  num: number | undefined
-): UnitizedNumber<Angle> | undefined {
-  return num != null ? Unitize.degrees(num) : undefined
 }

@@ -88,6 +88,27 @@ export function generateWallsOutput({
       },
     ],
   })
+
+  const unitizeDist = distanceUnit === 'feet' ? Length.feet : Length.meters
+  const unitizeAngle =
+    angleUnit === 'gradians'
+      ? Angle.gradians
+      : angleUnit === 'mils'
+      ? Angle.milsNATO
+      : Angle.degrees
+
+  function parseDistance(
+    num: number | undefined
+  ): UnitizedNumber<Length> | undefined {
+    return num != null ? new UnitizedNumber(num, unitizeDist) : undefined
+  }
+
+  function parseAngle(
+    num: number | undefined
+  ): UnitizedNumber<Angle> | undefined {
+    return num != null ? new UnitizedNumber(num, unitizeAngle) : undefined
+  }
+
   for (const { tables } of pages) {
     for (const { shots } of tables) {
       for (let i = 0; i < shots.length - 1; i++) {
@@ -131,16 +152,4 @@ export function generateWallsOutput({
     }
   }
   return formatWallsSrvFile({ lines })
-}
-
-function parseDistance(
-  num: number | undefined
-): UnitizedNumber<Length> | undefined {
-  return num != null ? Unitize.feet(num) : undefined
-}
-
-function parseAngle(
-  num: number | undefined
-): UnitizedNumber<Angle> | undefined {
-  return num != null ? Unitize.degrees(num) : undefined
 }
