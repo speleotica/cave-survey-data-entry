@@ -1,5 +1,5 @@
 import { Error, Warning } from '@mui/icons-material'
-import { TextField, InputAdornment, Tooltip } from '@mui/material'
+import { TextField, InputAdornment, Tooltip, useForkRef } from '@mui/material'
 import React from 'react'
 
 type UseHtmlFieldProps = (index: number) => React.ComponentProps<
@@ -96,12 +96,27 @@ export const SurveyDataTextField = ({
     [x, y, h]
   )
 
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const combinedRef = useForkRef(inputRef, InputProps?.inputRef)
+
+  const handleClick = React.useCallback(() => {
+    const input = inputRef.current
+    if (input != null && document.activeElement !== input) {
+      input.focus()
+    }
+  }, [])
+
+  const handleFocus = React.useCallback(() => {
+    inputRef.current?.select()
+  }, [])
+
   return (
     <TextField
       {...fieldProps}
       {...props}
       error={validationError != null}
       onKeyDown={onKeyDown}
+      onFocus={handleFocus}
       sx={{
         flexGrow: 1,
         flexShrink: 1,
@@ -124,6 +139,7 @@ export const SurveyDataTextField = ({
       }}
       InputProps={{
         ...InputProps,
+        inputRef: combinedRef,
         sx: {
           borderRadius: 0,
           height: '100%',
@@ -137,6 +153,7 @@ export const SurveyDataTextField = ({
               ml: 0,
               mr: -1.5,
             }}
+            onClick={handleClick}
           >
             <Tooltip
               disableInteractive
