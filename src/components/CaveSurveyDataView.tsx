@@ -45,19 +45,17 @@ export default function Home() {
   )
 }
 
-const initialTripHeader: TripHeader = {
-  name: '',
-  team: '',
-  angleUnit: 'degrees',
-  distanceUnit: 'feet',
-  backsightAzimuthCorrected: true,
-  backsightInclinationCorrected: true,
-  frontsightBacksightTolerance: 2,
-}
-
 const defaultValues: Values = {
   outputFormat: 'FRCS',
-  tripHeader: initialTripHeader,
+  tripHeader: {
+    name: '',
+    team: '',
+    angleUnit: 'degrees',
+    distanceUnit: 'feet',
+    backsightAzimuthCorrected: true,
+    backsightInclinationCorrected: true,
+    frontsightBacksightTolerance: 2,
+  },
   pages: [],
 }
 
@@ -294,7 +292,13 @@ function ClearDataButton() {
   return (
     <Button
       onClick={() => {
-        header.setParsedValue(initialTripHeader)
+        header.setValue({
+          ...header.value,
+          cave: '',
+          name: '',
+          team: '',
+          date: '',
+        })
         pages.setValue(
           (pages.value || []).map((page) => ({
             ...page,
@@ -317,7 +321,13 @@ function ClearAllButton() {
   return (
     <Button
       onClick={() => {
-        header.setParsedValue(initialTripHeader)
+        header.setValue({
+          ...header.value,
+          cave: '',
+          name: '',
+          team: '',
+          date: '',
+        })
         pages.setValue([])
       }}
     >
