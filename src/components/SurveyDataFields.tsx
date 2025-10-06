@@ -42,7 +42,7 @@ type UseFieldPropsMap = {
   notes?: UseHtmlFieldProps
 }
 
-export const SurveyPageFields = React.memo(function SurveyPageFields({
+export const SurveyDataFields = React.memo(function SurveyDataFields({
   useFieldProps,
   layoutVariant = 'IMO',
 }: {

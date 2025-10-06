@@ -1,12 +1,12 @@
 import { Box } from '@mui/material'
 import React from 'react'
-import { SurveySheet } from './SurveySheet'
+import { SurveyPage } from './SurveyPage'
 import { form } from '../form'
 import { useIdb } from './IdbContext'
 import { rectToTableBounds } from '../types'
 import * as uuid from 'uuid'
 
-export function SurveySheetsField() {
+export function SurveyPagesArray() {
   const { elements, push, remove } = form.useArrayField('pages')
 
   const idb = useIdb()
@@ -56,7 +56,7 @@ export function SurveySheetsField() {
       onDrop={handleDrop}
     >
       {elements.map((field, index) => (
-        <SurveySheet key={index} field={field} onDelete={() => remove(index)} />
+        <SurveyPage key={index} field={field} onDelete={() => remove(index)} />
       ))}
       {!elements.length ? (
         <Box

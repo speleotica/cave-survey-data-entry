@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Box from '@mui/material/Box'
-import { SurveyPageFields } from './SurveyPageFields'
+import { SurveyDataFields } from './SurveyDataFields'
 import { Page, Shot } from '../types'
 import { Fab, MenuItem } from '@mui/material'
 import { Delete } from '@mui/icons-material'
@@ -13,7 +13,7 @@ import { createIdb } from '@/idb/idb'
 import z from 'zod'
 import { form } from '@/form'
 
-export function SurveySheet({
+export function SurveyPage({
   field,
   onDelete,
 }: {
@@ -159,7 +159,7 @@ export function SurveySheet({
               <Delete />
             </Fab>
           </Box>
-          <SurveyPageFields
+          <SurveyDataFields
             layoutVariant={layoutVariant}
             useFieldProps={useFieldPropsMap}
           />

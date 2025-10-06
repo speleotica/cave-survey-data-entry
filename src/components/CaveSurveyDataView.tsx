@@ -17,7 +17,7 @@ import { createIdb, Idb } from '@/idb/idb'
 import { IdbProvider } from './IdbContext'
 import { form } from '../form'
 import { FormSwitchField } from './FormSwitchField'
-import { SurveySheetsField } from './SurveySheetsField'
+import { SurveyPagesArray } from './SurveyPagesArray'
 import { FormTextField } from './FormTextField'
 import { ArrowDropDown } from '@mui/icons-material'
 import { UseField } from './UseField'
@@ -258,7 +258,7 @@ function Home2() {
               </Box>
             </Box>
           </Collapse>
-          <SurveySheetsField />
+          <SurveyPagesArray />
         </Box>
         <Box
           sx={{
