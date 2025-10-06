@@ -268,7 +268,7 @@ function Home2() {
           <FormTextField
             field={form.get('outputFormat')}
             type="text"
-            label="Format"
+            label="Output Format"
             select
             fullWidth
           >
