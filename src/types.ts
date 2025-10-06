@@ -168,11 +168,11 @@ export const Values = z.object({
 })
 
 const BacksightValidationValues = z.object({
-  tripHeader: z.object({
-    angleUnit: AngleUnit,
-    backsightAzimuthCorrected: z.boolean().default(true).optional(),
-    backsightInclinationCorrected: z.boolean().default(true).optional(),
-    frontsightBacksightTolerance: z.number().positive().default(2),
+  tripHeader: TripHeader.pick({
+    angleUnit: true,
+    backsightAzimuthCorrected: true,
+    backsightInclinationCorrected: true,
+    frontsightBacksightTolerance: true,
   }),
   pages: z.array(
     z
