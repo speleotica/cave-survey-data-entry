@@ -2,7 +2,7 @@ import * as React from 'react'
 import Box from '@mui/material/Box'
 import { SurveyDataFields } from './SurveyDataFields'
 import { Page, Shot } from '../types'
-import { Fab, MenuItem } from '@mui/material'
+import { Fab } from '@mui/material'
 import { Delete } from '@mui/icons-material'
 import { HomographyBox } from './HomographyBox'
 import { HomographyControlPoints } from './HomographyControlPoints'
@@ -12,6 +12,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createIdb } from '@/idb/idb'
 import z from 'zod'
 import { form } from '@/form'
+import { SurveyPageLayoutField } from './SurveyPageLayoutField'
 
 export function SurveyPage({
   field,
@@ -134,27 +135,7 @@ export function SurveyPage({
               gap: 2,
             }}
           >
-            <FormTextField
-              variant="filled"
-              type="text"
-              field={tableField.get('layoutVariant')}
-              select
-              label="Layout"
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }}
-            >
-              <MenuItem value="IMO">Inner Mountain Outfitters</MenuItem>
-              <MenuItem value="Lech">Lechuguilla</MenuItem>
-              <MenuItem value="X-38">Cave Research Foundation X-38</MenuItem>
-              <MenuItem value="X-39">Cave Research Foundation X-39</MenuItem>
-              <MenuItem value="FromStaDisAzIncLrUd">
-                From Sta | Dist | Az F/B | Inc F/B | L R | U D
-              </MenuItem>
-              <MenuItem value="ToStaDisAzIncLrUd">
-                To Sta | Dist | Az F/B | Inc F/B | L R | U D
-              </MenuItem>
-            </FormTextField>
+            <SurveyPageLayoutField field={tableField.get('layoutVariant')} />
             <Fab onClick={onDelete}>
               <Delete />
             </Fab>
