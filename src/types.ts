@@ -1,5 +1,5 @@
 import z from 'zod'
-import { invertible } from 'zod-invertible'
+import { IgnoreEffect, invertible } from 'zod-invertible'
 import { tellMeWhen } from 'tell-me-when'
 import { Angle, Unitize, UnitizedNumber, UnitType } from '@speleotica/unitized'
 
@@ -167,8 +167,54 @@ export const Values = z.object({
   pages: z.array(Page).default([]),
 })
 
-export type ValidatedValues = z.output<typeof ValidatedValues>
-export const ValidatedValues = Values.superRefine((values, ctx) => {
+const BacksightValidationValues = z.object({
+  tripHeader: z.object({
+    angleUnit: AngleUnit,
+    backsightAzimuthCorrected: z.boolean().default(true).optional(),
+    backsightInclinationCorrected: z.boolean().default(true).optional(),
+    frontsightBacksightTolerance: z.number().positive().default(2),
+  }),
+  pages: z.array(
+    z
+      .object({
+        tables: z
+          .array(
+            z
+              .object({
+                shots: z
+                  .array(
+                    z
+                      .object({
+                        frontsightAzimuth: Azimuth.optional().catch(undefined),
+                        backsightAzimuth: Azimuth.optional().catch(undefined),
+                        frontsightInclination:
+                          Inclination.optional().catch(undefined),
+                        backsightInclination:
+                          Inclination.optional().catch(undefined),
+                      })
+                      .optional()
+                      .catch(undefined)
+                  )
+                  .optional()
+                  .catch(undefined),
+              })
+              .optional()
+              .catch(undefined)
+          )
+          .optional()
+          .catch(undefined),
+      })
+      .optional()
+      .catch(undefined)
+  ),
+})
+
+export const ValidatedValues = z.preprocess((raw, ctx) => {
+  const parsed = BacksightValidationValues.safeParse(raw)
+  if (!parsed.success) return raw
+
+  const values = parsed.data
+
   const { tripHeader, pages } = values
   const {
     backsightAzimuthCorrected,
@@ -184,9 +230,11 @@ export const ValidatedValues = Values.superRefine((values, ctx) => {
       ? new UnitizedNumber(frontsightBacksightTolerance, angleUnit)
       : Unitize.degrees(2)
   for (let p = 0; p < pages.length; p++) {
-    const { tables } = pages[p]
+    const tables = pages[p]?.tables
+    if (!tables) continue
     for (let t = 0; t < tables.length; t++) {
-      const { shots } = tables[t]
+      const shots = tables[t]?.shots
+      if (!shots) continue
       for (let s = 0; s < shots.length; s++) {
         const shot = shots[s]
         if (!shot) continue
@@ -250,7 +298,10 @@ export const ValidatedValues = Values.superRefine((values, ctx) => {
       }
     }
   }
-})
+
+  return raw
+}, Values) as z.ZodType<z.output<typeof Values>, any, z.input<typeof Values>>
+;(ValidatedValues as any)[IgnoreEffect] = true
 
 function unitizedToFixed<T extends UnitType<T>>(
   value: UnitizedNumber<T>,
@@ -258,122 +309,3 @@ function unitizedToFixed<T extends UnitType<T>>(
 ) {
   return `${value.get(value.unit).toFixed(precision)} ${value.unit.toString()}`
 }
-
-export const invalidTripHeaderFieldPath = z
-  .tuple([z.literal('tripHeader'), z.string()])
-  .transform(([, field]) => ({ field }))
-
-export const invalidMeasurementPath = z
-  .tuple([
-    z.literal('pages'),
-    z.number(),
-    z.literal('tables'),
-    z.number(),
-    z.literal('shots'),
-    z.number(),
-    z.enum([
-      'distance',
-      'frontsightAzimuth',
-      'backsightAzimuth',
-      'frontsightInclination',
-      'backsightInclination',
-    ]),
-  ])
-  .transform(
-    ([
-      pages,
-      pageIndex,
-      tables,
-      tableIndex,
-      shots,
-      shotIndex,
-      measurement,
-    ]) => ({
-      pageIndex,
-      tableIndex,
-      shotIndex,
-      measurement,
-      shotPath: [pages, pageIndex, tables, tableIndex, shots, shotIndex],
-      paths: {
-        fromStationName: [
-          pages,
-          pageIndex,
-          tables,
-          tableIndex,
-          shots,
-          shotIndex,
-          'from',
-          'station',
-        ],
-        toStationName: [
-          pages,
-          pageIndex,
-          tables,
-          tableIndex,
-          shots,
-          shotIndex + 1,
-          'from',
-          'station',
-        ],
-        isSplit: [
-          pages,
-          pageIndex,
-          tables,
-          tableIndex,
-          shots,
-          shotIndex + 1,
-          'isSplit',
-        ],
-        splitToStationName: [
-          pages,
-          pageIndex,
-          tables,
-          tableIndex,
-          shots,
-          shotIndex + 1,
-          'to',
-          'station',
-        ],
-      },
-    })
-  )
-
-export const invalidLrudPath = z
-  .tuple([
-    z.literal('pages'),
-    z.number(),
-    z.literal('tables'),
-    z.number(),
-    z.literal('shots'),
-    z.number(),
-    z.enum(['from', 'to']),
-    z.enum(['left', 'right', 'up', 'down']),
-  ])
-  .transform(
-    ([
-      pages,
-      pageIndex,
-      tables,
-      tableIndex,
-      shots,
-      shotIndex,
-      station,
-      lrud,
-    ]) => ({
-      pageIndex,
-      tableIndex,
-      shotIndex,
-      station,
-      lrud,
-      stationNamePath: [
-        pages,
-        pageIndex,
-        tables,
-        tableIndex,
-        shots,
-        shotIndex,
-        station,
-        'station',
-      ],
-    })
-  )

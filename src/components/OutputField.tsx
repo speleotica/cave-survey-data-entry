@@ -2,12 +2,12 @@ import * as React from 'react'
 import { TextField } from '@mui/material'
 import asyncThrottle from '@jcoreio/async-throttle'
 import { generateFrcsOutput } from '../util/generateFrcsOutput'
+import { Values } from '../types'
 import {
   invalidLrudPath,
   invalidMeasurementPath,
   invalidTripHeaderFieldPath,
-  Values,
-} from '../types'
+} from '../errorPaths'
 import { form } from '../form'
 import { generateCompassOutput } from '@/util/generateCompassOutput'
 import { generateWallsOutput } from '@/util/generateWallsOutput'
