@@ -52,6 +52,12 @@ export const SurveyPageLayoutDefs: Record<LayoutVariant, SurveyPageLayoutDef> =
       notes: 'afterLrud',
       notesWidth: '30%',
     },
+    Cincinnati: {
+      staggered: true,
+      numRows: 11,
+      stationWidth: '15%',
+      shotWidth: '45%',
+    },
     'X-38': {
       staggered: true,
       numRows: 10,

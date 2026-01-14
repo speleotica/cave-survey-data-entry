@@ -25,6 +25,7 @@ export function SurveyPageLayoutField({
       <MenuItem value="Lech">Lechuguilla</MenuItem>
       <MenuItem value="X-38">Cave Research Foundation X-38</MenuItem>
       <MenuItem value="X-39">Cave Research Foundation X-39</MenuItem>
+      <MenuItem value="Cincinnati">Greater Cincinnati Grotto</MenuItem>
       <MenuItem value="FromStaDisAzIncLrUd">
         From Sta | Dist | Az F/B | Inc F/B | L R | U D
       </MenuItem>

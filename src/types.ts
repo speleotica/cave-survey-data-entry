@@ -64,6 +64,7 @@ export const LayoutVariant = z.enum([
   'Lech',
   'X-38',
   'X-39',
+  'Cincinnati',
   'FromStaDisAzIncLrUd',
   'ToStaDisAzIncLrUd',
 ])
