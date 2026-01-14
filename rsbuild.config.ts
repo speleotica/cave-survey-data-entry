@@ -5,6 +5,9 @@ export default defineConfig({
   output: {
     assetPrefix: '/cave-survey-data-entry/',
   },
+  html: {
+    title: 'Cave Survey Data Entry',
+  },
   plugins: [
     pluginReact({
       swcReactOptions: {
